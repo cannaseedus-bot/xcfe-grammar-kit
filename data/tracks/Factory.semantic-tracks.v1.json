@@ -1,0 +1,65 @@
+{
+  "@no-eval": true,
+  "id": "Factory",
+  "description": "Micronaut factory — create/evolve/delete micronauts via the Candidate pattern. Direct registry mutation is private; all structural writes go through propose_create/propose_evolve → XulGate::authorize_commit → commit(FactoryCandidate, CommitAuthority). Phase map: create→Wo, evolve→Yax, propose→Wo, verify→Ch'en, commit→Xul, list/read→Pop, edit/patch→Sek, delete→Xul.",
+  "phase": "Wo",
+  "confidence": 1.0,
+  "governs": [
+    "create", "evolve", "delete", "factory", "propose", "commit", "new micronaut", "build", "make", "spawn"
+  ],
+  "capabilities": [
+    "Factory:propose_create",
+    "Factory:propose_evolve",
+    "Factory:commit",
+    "Factory:list",
+    "Factory:read",
+    "Factory:edit",
+    "Factory:patch",
+    "Factory:status",
+    "Factory:delete",
+    "Factory:persist",
+    "Factory:persist_binary",
+    "Factory:load_state",
+    "Factory:record_key",
+    "Factory:lookup_key"
+  ],
+  "op_phase_map": {
+    "propose_create": "Wo",
+    "propose_evolve": "Yax",
+    "commit":         "Xul",
+    "list":           "Pop",
+    "read":           "Pop",
+    "edit":           "Sek",
+    "patch":          "Sek",
+    "status":         "Ch'en",
+    "delete":         "Xul"
+  },
+  "confidence_floor": 0.7,
+  "commit_protocol": {
+    "propose":          "Factory::propose_create/propose_evolve → optional<FactoryCandidate>",
+    "authorize":        "XulGate::authorize_commit(CommitDecision{all-true, Xul}, 'micronaut-registry', 'create:<id>'|'evolve:<id>') → optional<CommitAuthority>",
+    "commit":           "Factory::commit(FactoryCandidate, CommitAuthority) — validates scope+identity, applies to reg_",
+    "identity_binding": "authority.proposal_identity() must equal candidate.proposal_identity",
+    "gravity_side_effect": "Evolve commit calls reg_.gravity().register_nodes(...) — moved from evolve() into commit()"
+  },
+  "relations": [
+    { "target": "FACTORY-µ", "verb": "@defines",      "directed": true },
+    { "target": "Coordinator","verb": "@related_to",   "directed": false }
+  ],
+  "sandbox": {
+    "gram_ns":         "Factory",
+    "manifest_access": ["micronaut", "kuhul"],
+    "effects":         ["gramRead", "gramWrite", "micronaut:propose", "micronaut:commit", "micronaut:delete"],
+    "ports":           [],
+    "coordinator":     false
+  },
+  "folds": [
+    {"phase": "Pop",   "op": "gramRead",        "key": "factory_op"},
+    {"phase": "Wo",    "op": "propose_create"},
+    {"phase": "Yax",   "op": "propose_evolve"},
+    {"phase": "Sek",   "op": "edit_micronaut"},
+    {"phase": "Ch'en", "op": "verify_candidate"},
+    {"phase": "Xul",   "op": "commit_candidate", "scope": "micronaut-registry", "authority": "XulGate"},
+    {"phase": "Xul",   "op": "delete_micronaut",  "scope": "local", "gate": "confidence_floor:0.7"}
+  ]
+}

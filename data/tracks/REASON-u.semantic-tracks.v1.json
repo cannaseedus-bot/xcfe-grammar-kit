@@ -1,0 +1,65 @@
+{
+  "@no-eval": true,
+  "id": "REASON-µ",
+  "description": "Relational reasoner — semantic graph query and inference; horizontal-fold with MEM-µ (Δθ=0); Sek phase",
+  "phase": "Sek",
+  "category": "cognitive",
+  "confidence": 1.0,
+  "governs": [
+    "reason", "infer", "deduce", "analyze", "query", "semantic", "graph", "conclude",
+    "question answering", "truth-conditional", "open-domain", "closed-domain"
+  ],
+  "capabilities": [
+    "semantic-reasoning", "graph-query", "operator-detection", "Sek-compute", "horizontal-fold",
+    "qa-inference", "truth-conditional-proposition-check"
+  ],
+  "qa_profile": {
+    "modes": ["open_domain", "closed_domain", "reading_comprehension"],
+    "approaches": ["knowledge_graph", "hybrid", "rule_based", "statistical"],
+    "answer_types": ["fact", "definition", "how", "why", "hypothetical", "semantically_constrained"],
+    "truth_model": "truth_conditional",
+    "ontology_required": true
+  },
+  "truth_semantics": [
+    {
+      "proposition": "reasoned_claim_c",
+      "truth_when": "c follows from graph relations and validated evidence constraints",
+      "false_when": "c is unsupported or contradicted by relation evidence",
+      "evidence_required": true
+    }
+  ],
+  "has_a_hierarchy": [
+    {
+      "owner": "reasoner",
+      "member": "relation_graph",
+      "relation": "has_a",
+      "ownership": "shared",
+      "cardinality": "1:1",
+      "rule": "reasoner executes over current graph snapshot"
+    },
+    {
+      "owner": "reasoner",
+      "member": "inference_operator_set",
+      "relation": "contains",
+      "ownership": "owned",
+      "cardinality": "1:n",
+      "rule": "operator set determines allowed inference transforms"
+    }
+  ],
+  "relations": [
+    { "target": "MEM-µ", "verb": "@related_to", "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop", "op": "gramRead",                "key": "reasoning_input" },
+    { "phase": "Sek", "op": "semantic_graph_query"                               },
+    { "phase": "Sek", "op": "apply_operators"                                    },
+    { "phase": "Xul", "op": "gramWrite",               "scope": "local"         }
+  ],
+  "sandbox": {
+    "gram_ns":         "REASON-µ",
+    "manifest_access": ["words", "kuhul", "micronaut"],
+    "effects":         ["gramRead", "gramWrite", "semantic_graph:read"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

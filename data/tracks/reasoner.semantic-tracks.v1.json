@@ -1,0 +1,48 @@
+{
+  "@no-eval": true,
+  "id": "reasoner",
+  "description": "Logical inference and chain-of-thought — reads evidence at Yax, derives conclusions at Sek, commits evidence weights at Ch'en; @inference_graph is a live G_semantic sub-graph",
+  "phase": "Yax",
+  "confidence": 1.0,
+  "governs": ["reason", "infer", "deduce", "conclude", "because", "therefore", "evidence",
+              "logic", "chain-of-thought", "contradict", "prove", "argument", "analyze",
+              "summarize", "summary", "explain", "eli5", "meeting", "action items", "compare"],
+  "capabilities": [
+    "logical-deduction", "abductive-reasoning", "chain-of-thought",
+    "evidence-weighting", "counterargument-detection", "xcfe-eval",
+    "summarization", "concept-explainer", "meeting-note-reduction",
+    "⟁Yax", "⟁Sek", "⟁Ch'en"
+  ],
+  "delivers": [
+    { "type": "xcfe_program", "schema": "xcfe:v2",  "phase": "Sek"   },
+    { "type": "fold_result",  "schema": "fold:v2",  "phase": "Ch'en" },
+    { "type": "gram_record",  "schema": "gram:v1",  "phase": "Xul"   }
+  ],
+  "cognitive_state": {
+    "temperature": { "current": 0.3, "min": 0.0, "max": 0.6, "adaptive": true },
+    "response_flare": { "enthusiasm": 0.3, "certainty": 0.85, "verbosity": 0.8, "empathy": 0.3 }
+  },
+  "inference_graph": {
+    "nodes": {},
+    "edges": [],
+    "active_chain": [],
+    "contradiction_log": []
+  },
+  "folds": [
+    { "phase": "Yax",   "op": "gramRead",                  "key": "reasoning_input"   },
+    { "phase": "Yax",   "op": "extract_claims"                                         },
+    { "phase": "Yax",   "op": "build_inference_edges"                                  },
+    { "phase": "Yax",   "op": "detect_contradictions"                                  },
+    { "phase": "Sek",   "op": "topological_inference"                                  },
+    { "phase": "Sek",   "op": "build_chain_of_thought"                                 },
+    { "phase": "Ch'en", "op": "commit_evidence_weights",  "scope": "semantic_memory"  },
+    { "phase": "Xul",   "op": "gramWrite",                "scope": "local"             }
+  ],
+  "sandbox": {
+    "gram_ns":         "reasoner",
+    "manifest_access": ["words", "kuhul", "micronaut"],
+    "effects":         ["gramRead", "gramWrite", "semantic_graph:read", "semantic_graph:write"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

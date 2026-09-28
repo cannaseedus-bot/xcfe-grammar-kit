@@ -1,0 +1,45 @@
+{
+  "@no-eval": true,
+  "id": "BLOG-µ",
+  "description": "Blog micronaut — declarative blog app blueprint for posts, comments, moderation, and publish gates",
+  "phase": "Yax",
+  "category": "application",
+  "confidence": 1.0,
+  "governs": [
+    "blog", "post", "draft", "publish", "comment", "moderate",
+    "author", "tag", "archive", "blog:", "@blog"
+  ],
+  "capabilities": [
+    "blog-schema-routing", "post-composition", "editor-workflow",
+    "comment-moderation", "publish-verification",
+    "semantic-slot-binding", "content-layout-routing"
+  ],
+  "pattern_registry": {
+    "insert_key": "BLOG:",
+    "invoke_node": "@blog",
+    "wrapper": "<blog>{intent}</blog>",
+    "fallback": "<blog>{input}</blog>"
+  },
+  "relations": [
+    { "target": "ORCH-µ", "verb": "@delegates_to", "directed": true },
+    { "target": "MEM-µ",  "verb": "@part_of",  "directed": true },
+    { "target": "Mx2LM",  "verb": "@redirect",    "directed": true },
+    { "target": "APP-WIZARD-µ", "verb": "@part_of", "directed": true },
+    { "target": "Librarian", "verb": "@delegates_to", "directed": true }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",              "key": "blog_request"         },
+    { "phase": "Wo",    "op": "load_blog_schema"                                   },
+    { "phase": "Yax",   "op": "compose_post_plan"                                  },
+    { "phase": "Sek",   "op": "draft_post_blocks"                                  },
+    { "phase": "Ch'en", "op": "verify_publish_policy"                              },
+    { "phase": "Xul",   "op": "gramWrite",             "scope": "blog"             }
+  ],
+  "sandbox": {
+    "gram_ns":         "BLOG-µ",
+    "manifest_access": ["words", "micronaut", "kuhul", "css"],
+    "effects":         ["gramRead", "gramWrite", "route:delegate", "route:compose", "publish:post", "moderate:comment"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

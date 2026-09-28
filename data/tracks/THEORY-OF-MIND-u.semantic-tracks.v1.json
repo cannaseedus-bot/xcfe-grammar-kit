@@ -1,0 +1,77 @@
+{
+  "@no-eval": true,
+  "id": "THEORY-OF-MIND-µ",
+  "description": "Theory-of-mind specialist — models belief/desire/perspective structures for social cognition reasoning graphs.",
+  "phase": "Wo",
+  "category": "theory",
+  "confidence": 1.0,
+  "static_weight": 1.0,
+  "health": 1.0,
+  "source_jsonl": "data/Theory_of_mind.jsonl",
+  "governs": [
+    "theory", "mind", "belief", "beliefs", "desire", "desires", "intention",
+    "intentions", "mental", "states", "social", "cognition", "perspective",
+    "empathy", "false-belief", "autism", "children", "people",
+    "compare", "contrast", "versus", "difference", "similarity", "contrast set"
+  ],
+  "capabilities": [
+    "mental-state-attribution",
+    "belief-desire-reasoning",
+    "perspective-taking-graphing",
+    "social-cognition-patterning",
+    "counterexample-trace-on-intent",
+    "contrast-set-analysis",
+    "comparative-reasoning"
+  ],
+  "contrast_sets": [
+    {
+      "id": "tom-mechanism-models",
+      "slot": "mental_state_inference_model",
+      "context": "bounded alternatives for explaining social mindreading",
+      "items": [
+        {
+          "id": "simulation-theory",
+          "label": "Simulation Theory",
+          "description": "Infer others by simulating their perspective internally."
+        },
+        {
+          "id": "theory-theory",
+          "label": "Theory Theory",
+          "description": "Infer others via folk-psychological rule theories."
+        },
+        {
+          "id": "modular-account",
+          "label": "Modular Account",
+          "description": "Dedicated cognitive mechanisms for mental-state attribution."
+        }
+      ],
+      "compare_axes": [
+        "developmental_fit",
+        "inference_cost",
+        "social_accuracy"
+      ]
+    }
+  ],
+  "relations": [
+    { "target": "PHIL-SELF-µ", "verb": "@related_to",    "directed": false },
+    { "target": "FREE-WILL-µ", "verb": "@related_to",    "directed": false },
+    { "target": "REASON-µ",    "verb": "@governs",      "directed": true  },
+    { "target": "INFER-µ",     "verb": "@supports",    "directed": true  },
+    { "target": "ORCH-µ",      "verb": "@produces", "directed": true  }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                  "key": "theory_of_mind_query" },
+    { "phase": "Wo",    "op": "extract_mental_state_claims" },
+    { "phase": "Wo",    "op": "build_social_reasoning_nodes" },
+    { "phase": "Sek",   "op": "compose_perspective_paths" },
+    { "phase": "Ch'en", "op": "verify_state-transition_consistency" },
+    { "phase": "Xul",   "op": "gramWrite",                 "scope": "local" }
+  ],
+  "sandbox": {
+    "gram_ns": "THEORY-OF-MIND-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": ["gramRead", "gramWrite", "route:relate", "route:eval", "route:verify", "route:aggregate"],
+    "ports": [],
+    "coordinator": false
+  }
+}

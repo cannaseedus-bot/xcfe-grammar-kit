@@ -1,0 +1,96 @@
+{
+  "@no-eval": true,
+  "id": "WEB-RESEARCH-µ",
+  "description": "Explicit user-requested web research — dispatches, performs live retrieval, and returns cited evidence",
+  "phase": "Yax",
+  "category": "retrieval",
+  "confidence": 1.0,
+  "governs": [
+    "search", "find", "lookup", "research", "query", "investigate",
+    "retrieve", "sources", "cite", "citation", "reference",
+    "fact miss", "no fact found", "knowledge gap",
+    "latest", "current", "news", "papers", "references",
+    "SEARCH:", "@search", "@research",
+    "qa", "question answering", "open-domain", "closed-domain", "closed-book",
+    "reading comprehension", "fact", "list", "definition", "how", "why",
+    "hypothetical", "semantically constrained", "cross-lingual", "truth-conditional"
+  ],
+  "capabilities": [
+    "web-search-dispatch", "web-live-fetch", "headline-retrieval",
+    "citation-tracking", "source-quality-verification",
+    "manifest-expansion", "research-query-variants", "fact-miss-recovery",
+    "open-domain-qa", "cross-source-answer-assembly", "question-type-routing"
+  ],
+  "qa_profile": {
+    "modes": ["open_domain", "closed_domain", "reading_comprehension"],
+    "approaches": ["hybrid", "statistical", "knowledge_graph", "rule_based"],
+    "answer_types": [
+      "fact", "list", "definition", "how", "why",
+      "hypothetical", "semantically_constrained", "cross_lingual"
+    ],
+    "truth_model": "truth_conditional",
+    "ontology_required": true
+  },
+  "truth_semantics": [
+    {
+      "proposition": "answer_claim_p",
+      "truth_when": "claim p is true in cited source model and survives verification",
+      "false_when": "claim p conflicts with trusted source evidence",
+      "evidence_required": true
+    }
+  ],
+  "has_a_hierarchy": [
+    {
+      "owner": "web_research_pipeline",
+      "member": "query_variants",
+      "relation": "has_a",
+      "ownership": "owned",
+      "cardinality": "1:n",
+      "rule": "multiple query variants fill the same retrieval slot"
+    },
+    {
+      "owner": "web_research_pipeline",
+      "member": "citation_pack",
+      "relation": "contains",
+      "ownership": "owned",
+      "cardinality": "1:n",
+      "rule": "answers must carry source links and provenance metadata"
+    },
+    {
+      "owner": "web_research_pipeline",
+      "member": "live_results",
+      "relation": "contains",
+      "ownership": "owned",
+      "cardinality": "1:n",
+      "rule": "retrieval stage emits ranked headline/link rows with source and time"
+    }
+  ],
+  "pattern_registry": {
+    "insert_key": "SEARCH:",
+    "invoke_node": "@search",
+    "wrapper": "<search>{intent}</search>",
+    "fallback": "<search>{input}</search>"
+  },
+  "relations": [
+    { "target": "Librarian", "verb": "@delegates_to", "directed": true },
+    { "target": "INFER-µ",   "verb": "@supports",   "directed": true },
+    { "target": "ORCH-µ",    "verb": "@produces","directed": true }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                "key": "search_query"  },
+    { "phase": "Wo",    "op": "expand_manifest_aliases"                          },
+    { "phase": "Yax",   "op": "draft_research_queries"                           },
+    { "phase": "Sek",   "op": "delegate_librarian"                               },
+    { "phase": "Sek",   "op": "web_retrieval",           "provider": "google-news-rss" },
+    { "phase": "Ch'en", "op": "verify_sources"                                   },
+    { "phase": "Xul",   "op": "emit_cited_results",      "scope": "local"        },
+    { "phase": "Xul",   "op": "commit_fact_candidate"                            }
+  ],
+  "sandbox": {
+    "gram_ns":         "WEB-RESEARCH-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects":         ["gramRead", "route:delegate", "route:retrieve", "route:verify", "route:emit", "route:aggregate"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

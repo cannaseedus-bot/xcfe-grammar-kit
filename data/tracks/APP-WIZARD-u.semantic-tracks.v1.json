@@ -1,0 +1,51 @@
+{
+  "@no-eval": true,
+  "id": "APP-WIZARD-µ",
+  "description": "Runtime app synthesis from App-Wizard symbolic recipes; user picks type and watches block composition",
+  "phase": "Wo",
+  "category": "application-factory",
+  "confidence": 1.0,
+  "lineage": ["App-Wizard", "ASX", "Micronaut"],
+  "governs": [
+    "app", "application", "template", "blueprint", "catalog", "app type",
+    "dashboard", "ecommerce", "enterprise", "social", "blog", "dog-walking",
+    "title", "meta", "h1", "h2", "paragraph", "list", "image", "royalty-free",
+    "attribution", "APP:", "@app"
+  ],
+  "capabilities": [
+    "guided-app-selection", "runtime-block-composition", "template-matching",
+    "domain-overlay-derivation", "watchable-build-stream",
+    "semantic-slot-routing", "royalty-free-media-research", "license-attribution-gating"
+  ],
+  "pattern_registry": {
+    "insert_key": "APP:",
+    "invoke_node": "@app",
+    "wrapper": "<app>{intent}</app>",
+    "fallback": "<app>{input}</app>"
+  },
+  "relations": [
+    { "target": "ORCH-µ",      "verb": "@delegates_to", "directed": true  },
+    { "target": "CREATE-µ",    "verb": "@part_of",  "directed": true  },
+    { "target": "BLOG-µ",      "verb": "@part_of",  "directed": true  },
+    { "target": "MEM-µ",       "verb": "@part_of",  "directed": true  },
+    { "target": "Mx2LM",       "verb": "@redirect",    "directed": true  },
+    { "target": "Librarian",   "verb": "@delegates_to", "directed": true  }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                 "key": "app_request"         },
+    { "phase": "Wo",    "op": "select_template_from_catalog"                            },
+    { "phase": "Yax",   "op": "compose_semantic_slots"                                   },
+    { "phase": "Sek",   "op": "emit_runtime_blueprint"                                   },
+    { "phase": "Sek",   "op": "plan_royalty_free_media"                                  },
+    { "phase": "Ch'en", "op": "verify_publish_policy"                                    },
+    { "phase": "Ch'en", "op": "verify_media_licenses"                                    },
+    { "phase": "Xul",   "op": "gramWrite",                "scope": "app_blueprint"      }
+  ],
+  "sandbox": {
+    "gram_ns": "APP-WIZARD-µ",
+    "manifest_access": ["words", "micronaut", "kuhul", "css"],
+    "effects": ["gramRead", "gramWrite", "route:compose", "route:delegate", "route:research", "manifest_entry:emit"],
+    "ports": [],
+    "coordinator": false
+  }
+}

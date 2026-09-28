@@ -1,0 +1,82 @@
+{
+  "@no-eval": true,
+  "id": "FREE-WILL-µ",
+  "description": "Free-will specialist — evaluates determinism/compatibilism positions and maps agency-control claims into verification-ready graphs.",
+  "phase": "Wo",
+  "category": "theory",
+  "confidence": 1.0,
+  "static_weight": 1.0,
+  "health": 1.0,
+  "source_jsonl": "data/Free_will.jsonl",
+  "governs": [
+    "free", "will", "free-will", "determinism", "compatibilism", "incompatibilism",
+    "agency", "autonomy", "responsibility", "choice", "control", "causation",
+    "indeterminism", "moral", "action", "actions", "future", "belief",
+    "compare", "contrast", "versus", "difference", "similarity", "contrast set"
+  ],
+  "capabilities": [
+    "agency-causation-analysis",
+    "compatibilism-incompatibilism-classification",
+    "responsibility-constraint-mapping",
+    "determinism-argument-evaluation",
+    "counterexample-pressure-testing",
+    "contrast-set-analysis",
+    "comparative-reasoning"
+  ],
+  "contrast_sets": [
+    {
+      "id": "free-will-positions",
+      "slot": "agency_under_determinism",
+      "context": "bounded alternatives in free-will debates",
+      "items": [
+        {
+          "id": "compatibilism",
+          "label": "Compatibilism",
+          "description": "Free will is compatible with determinism under suitable control conditions."
+        },
+        {
+          "id": "incompatibilism",
+          "label": "Incompatibilism",
+          "description": "Free will and strict determinism cannot both be true."
+        },
+        {
+          "id": "hard-determinism",
+          "label": "Hard Determinism",
+          "description": "Determinism is true and free will does not exist."
+        },
+        {
+          "id": "libertarian-free-will",
+          "label": "Libertarian Free Will",
+          "description": "Genuine agency requires indeterministic openness."
+        }
+      ],
+      "compare_axes": [
+        "control_requirement",
+        "moral_responsibility",
+        "causal_openness"
+      ]
+    }
+  ],
+  "relations": [
+    { "target": "THEORY-OF-MIND-µ", "verb": "@related_to",    "directed": false },
+    { "target": "PHIL-SELF-µ",      "verb": "@related_to",    "directed": false },
+    { "target": "REASON-µ",         "verb": "@governs",      "directed": true  },
+    { "target": "INFER-µ",          "verb": "@supports",    "directed": true  },
+    { "target": "ORCH-µ",           "verb": "@produces", "directed": true  }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                   "key": "free_will_query" },
+    { "phase": "Wo",    "op": "extract_causation_claims" },
+    { "phase": "Wo",    "op": "map_agency_constraints" },
+    { "phase": "Sek",   "op": "score_position_consistency" },
+    { "phase": "Ch'en", "op": "verify_argument_coherence" },
+    { "phase": "Xul",   "op": "gramWrite",                  "scope": "local" }
+  ],
+  "sandbox": {
+    "gram_ns": "FREE-WILL-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": ["gramRead", "gramWrite", "route:relate", "route:eval", "route:verify", "route:aggregate"],
+    "ports": [],
+    "coordinator": false
+  }
+}

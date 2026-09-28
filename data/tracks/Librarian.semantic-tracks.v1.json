@@ -1,0 +1,75 @@
+{
+  "@no-eval": true,
+  "id": "Librarian",
+  "description": "Knowledge retrieval and media research — Yax phase selector for semantic graph and royalty-free assets",
+  "phase": "Yax",
+  "confidence": 1.0,
+  "governs": ["search", "find", "lookup", "retrieve", "knowledge", "docs", "information",
+              "what is", "who is", "define", "explain",
+              "image", "images", "royalty-free", "license", "attribution", "media",
+              "citation", "sources", "research", "fact miss", "no fact found",
+              "latest", "current", "news", "papers", "references",
+              "qa", "question answering", "open-domain", "closed-domain", "closed-book",
+              "reading comprehension", "truth-conditional", "fact", "list", "definition",
+              "how", "why", "hypothetical", "cross-lingual"],
+  "capabilities": ["knowledge-base-search", "semantic-graph-traversal", "definition-lookup",
+                   "royalty-free-media-search", "license-attribution-filter",
+                   "source-citation-packaging", "research-delegation", "current-event-retrieval",
+                   "open-domain-qa", "closed-domain-qa", "closed-book-qa",
+                   "reading-comprehension-qa", "truth-conditional-verification",
+                   "knowledge-graph-qa"],
+  "qa_profile": {
+    "modes": ["reading_comprehension", "closed_domain", "open_domain"],
+    "approaches": ["hybrid", "knowledge_graph", "rule_based", "statistical"],
+    "answer_types": ["fact", "list", "definition", "how", "why", "hypothetical", "cross_lingual"],
+    "truth_model": "hybrid",
+    "ontology_required": true
+  },
+  "truth_semantics": [
+    {
+      "proposition": "answer_is_valid",
+      "truth_when": "answer corresponds to source-grounded world state and cited evidence",
+      "false_when": "answer lacks correspondence or provenance support",
+      "evidence_required": true
+    }
+  ],
+  "has_a_hierarchy": [
+    {
+      "owner": "qa_system",
+      "member": "retrieval_index",
+      "relation": "has_a",
+      "ownership": "owned",
+      "cardinality": "1:1",
+      "rule": "retrieval index is required for open-domain lookup"
+    },
+    {
+      "owner": "qa_system",
+      "member": "ontology",
+      "relation": "contains",
+      "ownership": "shared",
+      "cardinality": "1:n",
+      "rule": "domain and world ontologies constrain interpretation and matching"
+    }
+  ],
+  "relations": [
+    { "target": "WEB-RESEARCH-µ", "verb": "@related_to",    "directed": false },
+    { "target": "INFER-µ",        "verb": "@supports",    "directed": true  },
+    { "target": "ORCH-µ",         "verb": "@produces", "directed": true  }
+  ],
+  "folds": [
+    {"phase": "Pop", "op": "gramRead",    "key": "search_query"},
+    {"phase": "Yax", "op": "graph_bfs",   "max_depth": 3},
+    {"phase": "Yax", "op": "search_open_media"},
+    {"phase": "Sek", "op": "rank_results"},
+    {"phase": "Ch'en", "op": "verify_license_attribution"},
+    {"phase": "Xul", "op": "emit_answer", "scope": "local"}
+  ],
+  "memory_patterns": ["search_query", "search_results", "visited_nodes"],
+  "sandbox": {
+    "gram_ns":         "Librarian",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects":         ["gramRead", "route:delegate", "route:verify", "route:aggregate"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

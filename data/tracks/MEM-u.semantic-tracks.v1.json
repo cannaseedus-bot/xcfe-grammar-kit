@@ -1,0 +1,25 @@
+{
+  "@no-eval": true,
+  "id": "MEM-µ",
+  "description": "Relational memory — gram store access and confidence tracking; horizontal-fold with REASON-µ (Δθ=0); Pop phase",
+  "phase": "Pop",
+  "category": "storage",
+  "confidence": 1.0,
+  "governs": ["memory", "store", "retrieve", "recall", "gram", "confidence", "read", "lookup"],
+  "capabilities": ["gram-store", "confidence-tracking", "Pop-read", "horizontal-fold"],
+  "relations": [
+    { "target": "REASON-µ", "verb": "@related_to", "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop", "op": "gramRead",        "key": "mem_key"  },
+    { "phase": "Pop", "op": "confidence_get"                     },
+    { "phase": "Xul", "op": "gramWrite",       "scope": "local"  }
+  ],
+  "sandbox": {
+    "gram_ns":         "MEM-µ",
+    "manifest_access": ["words", "kuhul"],
+    "effects":         ["gramRead", "gramWrite", "confidence:read"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

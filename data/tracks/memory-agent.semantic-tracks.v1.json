@@ -1,0 +1,47 @@
+{
+  "@no-eval": true,
+  "id": "memory-agent",
+  "description": "Episodic retrieval and consolidation — writes gram records to IDB at Xul, reads at Pop; Xul→Pop fold cycle = SHM write/read between sessions",
+  "phase": "Xul",
+  "confidence": 1.0,
+  "governs": ["remember", "recall", "memory", "store", "retrieve", "consolidate", "checkpoint",
+              "gram", "session", "history", "forget", "lookup", "idb"],
+  "capabilities": [
+    "gram-read", "gram-write", "gram-checkpoint", "semantic-search",
+    "causal-chain-retrieval", "memory-consolidation", "idb-persist",
+    "⟁Pop", "⟁Xul"
+  ],
+  "delivers": [
+    { "type": "gram_record", "schema": "gram:v1",  "phase": "Xul" },
+    { "type": "fold_result", "schema": "fold:v2",  "phase": "Pop" }
+  ],
+  "idb_config": {
+    "store_name":       "kuhul_gram_store",
+    "schema_urn":       "urn:kuhul:gram:store:v1",
+    "max_entries":      100000,
+    "eviction_policy":  "LRU_with_importance_floor",
+    "importance_floor": 0.25
+  },
+  "consolidation_config": {
+    "interval_s":        3600,
+    "merge_threshold":   0.92,
+    "decay_rate":        0.02,
+    "checkpoint_every":  10
+  },
+  "folds": [
+    { "phase": "Pop", "op": "gramRead",           "key": "mem_query"                                       },
+    { "phase": "Pop", "op": "idb_query",          "top_k": 5, "filter": "importance >= floor"             },
+    { "phase": "Pop", "op": "rank_causal_chain"                                                             },
+    { "phase": "Xul", "op": "idb_put",            "schema": "urn:kuhul:gram:store:v1"                     },
+    { "phase": "Xul", "op": "idb_checkpoint",     "every": 10, "note": "K'ayab'→Kumk'u"                  },
+    { "phase": "Xul", "op": "merge_similar",      "gate": "scheduled:consolidate"                         },
+    { "phase": "Xul", "op": "gramWrite",          "scope": "local"                                        }
+  ],
+  "sandbox": {
+    "gram_ns":         "memory-agent",
+    "manifest_access": ["words", "kuhul"],
+    "effects":         ["gramRead", "gramWrite", "idb:read", "idb:write", "idb:checkpoint"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

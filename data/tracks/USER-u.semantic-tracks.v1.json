@@ -1,0 +1,31 @@
+{
+  "@no-eval": true,
+  "schema": "semantic-tracks.v1",
+  "id": "USER-µ",
+  "description": "The principal. Handles session identity and continuity — who the caller is, what state belongs to them, and which prior commitments are theirs. Distinct from MEMORY-µ, which stores session context as committed memory: this track decides whose context it is and whether a caller may act on it.",
+  "category": "identity",
+  "phase": "Pop",
+  "confidence": 0.6,
+  "static_weight": 0.6,
+  "governs": ["user", "session", "identity", "caller", "principal", "profile", "who", "impersonation"],
+  "capabilities": [
+    "save-session-context",
+    "session-identity-binding",
+    "caller-attribution",
+    "session-continuity",
+    "principal-scope-resolution"
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",              "key": "user:session:current" },
+    { "phase": "Pop",   "op": "read_caller_identity" },
+    { "phase": "Wo",    "op": "bind_principal",        "note": "identity conditions the request; it does not yet authorize it" },
+    { "phase": "Yax",   "op": "resolve_session_scope", "note": "which committed state belongs to this principal" },
+    { "phase": "Sek",   "op": "apply_session_state" },
+    { "phase": "Ch'en", "op": "verify_caller_authority", "note": "a caller may not act under another principal's session" },
+    { "phase": "Xul",   "op": "commit_session_state" }
+  ],
+  "relations": [
+    { "target": "MEMORY-µ", "verb": "@delegates_to", "directed": true },
+    { "target": "ELIZA",    "verb": "@related_to",   "directed": false }
+  ]
+}

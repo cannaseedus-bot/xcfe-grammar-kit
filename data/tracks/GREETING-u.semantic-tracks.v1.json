@@ -1,0 +1,50 @@
+{
+  "@no-eval": true,
+  "id": "GREETING-µ",
+  "description": "Greeting micronaut — adaptive salutation learning. Records every submitted greeting prompt's typed n-grams (unigram/bigram/trigram/quadgram/coarse/function/tool channels), archives observed greeting forms, mirrors greetings the user repeats (reactionary), adapts to the user's lingo over time, and synthesizes its own associative words in the same mannerisms via the phase-supplied greeting bank.",
+  "phase": "Pop",
+  "category": "social",
+  "confidence": 1.0,
+  "governs": [
+    "greeting", "greetings", "salutation", "hello", "hi", "hey", "yo",
+    "lingo", "mannerism", "mannerisms", "adapt", "reactive", "mirror",
+    "associative", "blend", "style_profile"
+  ],
+  "capabilities": [
+    "salutation-detection",
+    "greeting-ngram-archive",
+    "lingo-absorption",
+    "reactive-greeting-mirror",
+    "associative-variant-synthesis",
+    "phase-greeting-bank",
+    "style-profile-persistence"
+  ],
+  "pattern_registry": {
+    "insert_key": "GREETING:",
+    "invoke_node": "@greeting",
+    "wrapper": "<mx2lm>greeting phase={phase} kind={kind} {text}</mx2lm>",
+    "fallback": "<mx2lm>greeting {input}</mx2lm>"
+  },
+  "relations": [
+    { "target": "ELIZA", "verb": "@delegates_to", "directed": true },
+    { "target": "MEM-µ", "verb": "@related_to", "directed": false },
+    { "target": "Mx2LM", "verb": "@related_to", "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                   "key": "greeting_prompt" },
+    { "phase": "Pop",   "op": "salutation_detect" },
+    { "phase": "Wo",    "op": "absorb_lingo_cues" },
+    { "phase": "Wo",    "op": "archive_greeting_ngrams" },
+    { "phase": "Yax",   "op": "synthesize_associative_word" },
+    { "phase": "Ch'en", "op": "verify_style_confidence" },
+    { "phase": "Xul",   "op": "gramWrite",                 "scope": "local" }
+  ],
+  "memory_patterns": ["greeting_observed_forms", "mx2lm_style_profile", "lingo_blend_registry"],
+  "sandbox": {
+    "gram_ns":         "GREETING",
+    "manifest_access": ["words", "micronaut"],
+    "effects":         ["gramRead", "gramWrite", "greeting:emit", "style:adapt"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

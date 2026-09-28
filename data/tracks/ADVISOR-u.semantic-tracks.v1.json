@@ -1,0 +1,35 @@
+{
+  "@no-eval": true,
+  "id": "ADVISOR-µ",
+  "description": "Bootstrap advisor — classifies request patterns to existing experts, proposes bounded work, and exposes proposal state to the WPF card without execution authority.",
+  "phase": "Yax",
+  "category": "advisory",
+  "confidence": 1.0,
+  "governs": ["advisor", "advise", "expert", "help", "proposal", "gap", "missing", "unverified", "author", "grammar", "card_view"],
+  "capabilities": ["request_classification", "expert_admission", "proposal_projection", "gap_reporting", "wpf_card"],
+  "relations": [
+    {"target": "Coordinator", "verb": "@requires", "directed": true},
+    {"target": "TOOL-µ", "verb": "@related_to", "directed": false},
+    {"target": "REASON-µ", "verb": "@related_to", "directed": false}
+  ],
+  "folds": [
+    {"phase": "Pop", "op": "gramRead", "key": "advisor_request"},
+    {"phase": "Yax", "op": "admit_expert", "gate": "declared_route_match"},
+    {"phase": "Sek", "op": "emit_proposal", "gate": "authority == none"},
+    {"phase": "Ch'en", "op": "verify_proposal", "gate": "evidence_and_target_present"},
+    {"phase": "Xul", "op": "gramWrite", "scope": "advisor_proposal"}
+  ],
+  "ui": {
+    "card": "⟁WIDGETCARD",
+    "label": "Advisor",
+    "fields": ["task", "target", "evidence", "gaps", "proposal", "authority", "next"],
+    "activation_key": "track"
+  },
+  "sandbox": {
+    "gram_ns": "ADVISOR-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": ["gramRead", "proposal:emit", "card:project"],
+    "ports": [],
+    "coordinator": false
+  }
+}

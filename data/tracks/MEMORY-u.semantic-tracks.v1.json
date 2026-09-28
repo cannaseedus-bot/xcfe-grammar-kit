@@ -1,0 +1,90 @@
+{
+  "@no-eval": true,
+  "id": "MEMORY-µ",
+  "description": "Memory micronaut — saves and recalls user preferences, session context, and micronaut data. Called by user.session to persist memory to the gram store under mem:{category}:{key}. Returns UI cards for display. Exposes AIML patterns (remember/prefer/forget) and MCP tools (memory_save/memory_recall) so both the pattern engine and tool call engine have access. Pop reads current gram store state; Xul commits new entries. UI cards are the surface form: each stored entry becomes a displayable {id,category,key,value,card_title,card_hint} card.",
+  "phase": "Xul",
+  "category": "memory",
+  "confidence": 1.0,
+  "governs": [
+    "remember", "memory", "recall", "forget", "preference", "preferences",
+    "prefer", "save", "session", "user preference", "context", "card",
+    "mem:", "@memory", "MEMORY:", "note", "notes", "keep", "store"
+  ],
+  "capabilities": [
+    "save-user-preference",
+    "save-session-context",
+    "save-micronaut-data",
+    "recall-memory",
+    "forget-memory",
+    "ui-card-display",
+    "gram-store-persistence",
+    "aiml-pattern-memory",
+    "mcp-tool-memory"
+  ],
+  "active_verbs": ["recall", "remember", "forget", "distill"],
+  "support_role": "shared_context_and_distillation",
+  "gram_key_schema": {
+    "preference":    "mem:preference:{key}",
+    "session":       "mem:session:{key}",
+    "micronaut_data":"mem:micronaut_data:{key}",
+    "note":          "mem:note:{key}"
+  },
+  "ui_card_schema": {
+    "@kind":        "memory_card.v1",
+    "id":           "gram key",
+    "category":     "preference | session | micronaut_data | note",
+    "key":          "user-supplied identifier",
+    "value":        "stored value",
+    "card_title":   "optional display title",
+    "card_hint":    "optional display hint / description",
+    "phase_written":"Xul",
+    "channel":      "user_preference | session_context | micronaut_data"
+  },
+  "pattern_registry": {
+    "insert_key": "MEMORY:",
+    "invoke_node": "@memory",
+    "wrapper": "<mx2lm>memory-u op={op} category={category} {text}</mx2lm>",
+    "fallback": "<mx2lm>memory-u {input}</mx2lm>"
+  },
+  "tool_call_profile": {
+    "tools": ["memory_save", "memory_recall"],
+    "save_params":   ["category", "key", "value", "card_title", "card_hint"],
+    "recall_params": ["key", "category"]
+  },
+  "relations": [
+    { "target": "ELIZA",    "verb": "@delegates_to",  "directed": true },
+    { "target": "Mx2LM",    "verb": "@related_to",    "directed": false },
+    { "target": "GREETING-µ","verb": "@related_to",   "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",          "key": "mem:session:last_topic",
+      "note": "read current session state" },
+    { "phase": "Pop",   "op": "unfold_ngram_context", "note": "expand relevant ngram neighborhood before recall ranking" },
+    { "phase": "Wo",    "op": "classify_memory_op","note": "save | recall | forget | list" },
+    { "phase": "Yax",   "op": "resolve_category",  "note": "preference | session | micronaut_data | note" },
+    { "phase": "Sek",   "op": "score_recall_candidates", "note": "rank by recency and relevance" },
+    { "phase": "Sek",   "op": "fold_ngram_evidence", "scope": "memory_context", "note": "bind bounded ngram evidence to recalled entries" },
+    { "phase": "Ch'en", "op": "verify_key_authority","note": "caller may not write xcfe.* or fold.* keys" },
+    { "phase": "Xul",   "op": "gramWrite",          "scope": "local",
+      "channel": "user_preference | session_context | micronaut_data",
+      "authority": "MEMORY-µ" }
+  ],
+  "memory_patterns": [
+    "mem:preference:*",
+    "mem:session:*",
+    "mem:micronaut_data:*",
+    "mem:note:*",
+    "mem:session:last_topic",
+    "mem:session:last_intent",
+    "mem:session:ui_card_layout"
+  ],
+  "sandbox": {
+    "gram_ns":         "MEMORY",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects":         ["gramRead", "gramWrite", "memory:save", "memory:recall", "memory:forget"],
+    "key_prefix_allow":["mem:"],
+    "key_prefix_deny": ["xcfe.", "fold.", "ngram:", "ctrl:"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

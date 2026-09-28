@@ -1,0 +1,81 @@
+{
+  "@no-eval": true,
+  "id": "MATH-µ",
+  "description": "Domain math resolver — symbolic-first AIML/GraphPlan math lane with optional matrix-buffer primitives for linear algebra.",
+  "phase": "Sek",
+  "category": "cognitive",
+  "confidence": 1.0,
+  "static_weight": 1.0,
+  "health": 1.0,
+  "governs": [
+    "math", "equation", "algebra", "solve", "simplify", "factor", "expand", "evaluate",
+    "linear system", "matrix", "matmul", "eigenvalue", "determinant", "lambda",
+    "content mathml", "apply", "@math", "math:"
+  ],
+  "capabilities": [
+    "MATH_SYMBOLIC_SOLVE",
+    "MATH_SYMBOLIC_SIMPLIFY",
+    "MATH_SYMBOLIC_FACTOR",
+    "MATH_SYMBOLIC_EXPAND",
+    "MATH_SYMBOLIC_EVALUATE",
+    "MATRIX_BUFFER_ALLOC",
+    "MATRIX_BUFFER_LOAD",
+    "MATRIX_BUFFER_MATMUL",
+    "MATRIX_BUFFER_SOLVE",
+    "MATRIX_BUFFER_APPLY_OP",
+    "MATRIX_BUFFER_READ"
+  ],
+  "mathml_content_ops": [
+    "apply", "plus", "times", "power", "eq", "lt", "gt",
+    "and", "or", "not", "forall", "exists", "set", "list",
+    "fn", "lambda", "compose", "domain", "codomain"
+  ],
+  "resolver_primitives": [
+    "symbolic_math",
+    "matrix_buffer"
+  ],
+  "resolver_primitive_policy": {
+    "symbolic_default": true,
+    "matrix_required_for": [
+      "linear_system_solve",
+      "eigenvalue",
+      "decomposition",
+      "large_dense_matmul"
+    ],
+    "matrix_optional_for": [
+      "basic_algebraic_simplification",
+      "single_variable_isolation",
+      "small_polynomial_rewrite"
+    ]
+  },
+  "relations": [
+    { "target": "Mx2LM", "verb": "@part_of", "directed": true },
+    { "target": "INFER-µ", "verb": "@supports", "directed": true },
+    { "target": "REASON-µ", "verb": "@delegates_to", "directed": true },
+    { "target": "Librarian", "verb": "@requires", "directed": true }
+  ],
+  "folds": [
+    { "phase": "Pop", "op": "gramRead", "key": "math_query", "weight": 1.0 },
+    { "phase": "Wo", "op": "lower_math_aiml_graphplan", "note": "L_A math ISA extension", "weight": 1.0 },
+    { "phase": "Yax", "op": "derive_sgsfg_math_requirements", "note": "L_S synthesis graph derivation", "weight": 1.0 },
+    { "phase": "Sek", "op": "solve_symbolic", "scope": "symbolic_default", "weight": 1.0 },
+    { "phase": "Sek", "op": "matrix_buffer_dispatch", "gate": "requires_matrix_primitive", "weight": 0.8 },
+    { "phase": "Ch'en", "op": "verify_solution", "delegate": "INFER-µ", "weight": 1.0 },
+    { "phase": "Xul", "op": "emit_answer", "scope": "local", "weight": 1.0 }
+  ],
+  "sandbox": {
+    "gram_ns": "MATH-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": [
+      "gramRead",
+      "gramWrite",
+      "math:symbolic",
+      "matrix_buffer:alloc",
+      "matrix_buffer:load",
+      "matrix_buffer:op",
+      "matrix_buffer:read"
+    ],
+    "ports": [],
+    "coordinator": false
+  }
+}

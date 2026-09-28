@@ -1,0 +1,591 @@
+(* KHANARY key-grammar JSON Runtime EBNF v3 *)
+(* Typed gram channels are structured, phase-bound, provenance-carrying
+   records — never a bag of words. Every channel declares ordered width,
+   first-occurrence position, a semantic role, a K'UHUL phase binding,
+   a gram-store unit, a key-address form, and a consumption rule.
+
+   v3 changes vs v2:
+     - control_flow_row / control_step de-duplicated via shared field set.
+     - greeting_phase split into C6 phase + optional variant qualifier.
+     - channel_contract marked documentation-only and unreachable from document.
+     - template_slot_row added: template slot variables are first-class gram records.
+     - side-constraint block appended (SC-1 .. SC-13) capturing cross-field
+       invariants that were previously only implied. *)
+
+document = lexicon_row | relation_row | greeting_bank_row | greeting_learning_row
+         | control_flow_row | control_plan_row | template_slot_row ;
+
+(* ── Row forms ───────────────────────────────────────────────────────── *)
+lexicon_row =
+    "{",
+      q_word, ",", q_key, ",", q_unit, ",", q_class, ",", q_book, ",",
+      q_definition, ",", q_lexicon_source,
+      [ ",", q_synonyms ],
+      [ ",", q_definition_ngrams ],
+      [ ",", q_definition_keys ],
+      [ ",", q_gram_channels ],
+    "}" ;
+
+q_word           = "\"word\":", string ;
+q_key            = "\"key\":", string ;
+q_unit           = "\"unit\":", "\"unigram\"" ;   (* SC-3: key is unigram-scoped *)
+q_class          = "\"class\":", string ;
+q_book           = "\"book\":", string ;
+q_definition     = "\"definition\":", string ;
+q_lexicon_source = "\"lexicon_source\":", string ;
+q_synonyms            = "\"synonyms\":", string_array ;
+q_definition_ngrams   = "\"definition_ngrams\":", string_array ;
+q_definition_keys     = "\"definition_keys\":", string_array ;
+q_gram_channels       = "\"gram_channels\":", "{", gram_channel, { ",", gram_channel }, "}" ;
+
+gram_channel = "\"", gram_class, "\":", "[", [ typed_gram, { ",", typed_gram } ], "]" ;
+
+(* A typed gram: ordered gram text, frequency, ordered slot width, semantic
+   role, first-occurrence position (order evidence), K'UHUL phase binding,
+   and provenance of the evidence that produced it. Width counts ordered
+   slots: for coarse_gram each structural symbol (c, f:x, ctrl:x, t:x) is
+   ONE slot; position is omitted for coarse_gram because structural
+   skeletons carry shape, not lexical position. *)
+typed_gram =
+    "{",
+      "\"gram\":", string, ",",
+      "\"count\":", number, ",",
+      "\"width\":", number, ",",
+      "\"role\":", "\"", gram_role, "\"",
+      [ ",", "\"position\":", integer ],
+      [ ",", "\"phase\":", "\"", phase_name, "\"" ],
+      [ ",", "\"provenance\":", string ],
+    "}" ;
+
+relation_row =
+    "{",
+      "\"from\":", string, ",",
+      "\"relation\":", string, ",",
+      "\"to\":", string, ",",
+      "\"source_word\":", string, ",",
+      "\"evidence\":", string, ",",
+      "\"weight_kind\":", string, ",",
+      "\"weight\":", number,
+    "}" ;
+
+(* Supplied greeting bank: phase-indexed greeting templates operators can
+   extend. The runtime rotates greetings through the C6 phases, mirrors
+   greetings the user repeats (reactionary), adapts to learned lingo, and
+   synthesizes its own associative words in the same mannerisms.
+   SC-7: greeting entries are C6 phases optionally qualified by a variant. *)
+greeting_bank_row =
+    "{",
+      "\"schema\":", "\"key.grammar.greeting_bank.v1\"", ",",
+      [ "\"description\":", string, "," ],
+      "\"greetings\":", "[", greeting_phase_entry, { ",", greeting_phase_entry }, "]",
+    "}" ;
+
+greeting_phase_entry =
+    "{",
+      "\"phase\":", "\"", greeting_phase, "\"", ",",
+      [ "\"variant\":", "\"", greeting_variant, "\"", "," ],
+      "\"kind\":", "\"", greeting_kind, "\"", ",",
+      "\"templates\":", "[", template_text, { ",", template_text }, "]",
+    "}" ;
+
+(* C6 phase only — no dotted forms. Variants are a separate terminal so
+   "phase ∈ C6" stays a total, checkable predicate. *)
+greeting_phase   = phase_name ;
+greeting_variant = "reactive_mirror" | "synthesized_greeting" ;
+greeting_kind    = "canonical" | "learned" | "associative" | "reactionary"
+                 | "synthesized" | "status" | "confirmatory" | "recall" ;
+template_text    = ? greeting text with placeholders from template_placeholder ? ;
+
+template_placeholder = "{cue}" | "{Cue}" | "{greeting}" | "{Greeting}"
+                     | "{last}" | "{turns}" | "{lingo_count}"
+                     | "{blend}" | "{Blend}" ;
+
+(* Adaptive greeting learning profile (persisted key + gram record). *)
+greeting_learning_row =
+    "{",
+      "\"language\":", string, ",",
+      "\"random_chat_mode\":", boolean, ",",
+      "\"salutation_turns\":", number, ",",
+      "\"associative_variant_hits\":", number, ",",
+      "\"reactive_mirror_hits\":", number, ",",
+      "\"synthesized_word_hits\":", number, ",",
+      "\"last_user_greeting\":", string, ",",
+      "\"learned_lingo\":", "[", lingo_row, { ",", lingo_row }, "]", ",",
+      "\"observed_greetings\":", "[", observed_greeting_row, { ",", observed_greeting_row }, "]",
+    "}" ;
+
+lingo_row             = "{", "\"token\":", string, ",", "\"hits\":", number, "}" ;
+observed_greeting_row = "{", "\"form\":", string, ",", "\"hits\":", number, "}" ;
+
+(* ── Template slot declarations ──────────────────────────────────────── *)
+(* A template slot is a named, typed, phase-bound variable binding inside a
+   JSON kit or registry entry. It is structurally parallel to a lexicon_row:
+   a key in the gram store, a semantic type, a phase, and an edge that
+   declares how the slot relates to the kit that owns it.
+
+   key address: template:slot:<slot_name>
+   phase: governs the slot's semantic authority, not the template's phase.
+   edge_kind @provides:   the kit exposes this slot to consumers.
+   edge_kind @configures: filling the slot configures a downstream token.
+   edge_kind @requires:   the slot must be supplied by the caller.
+   edge_kind @overrides:  the slot value replaces a kit-level default.
+
+   SC-13: slot type ↔ unit coupling — see side-constraint block. *)
+
+template_slot_row =
+    "{",
+      "\"schema\":", "\"key.grammar.template_slot.v1\"", ",",
+      q_ts_key, ",", q_ts_name, ",", q_ts_type, ",", q_ts_phase, ",",
+      q_ts_edge_kind, ",", q_ts_default, ",", q_ts_unit, ",",
+      q_ts_kit_id,
+      [ ",", q_ts_description ],
+      [ ",", q_ts_css_vars ],
+    "}" ;
+
+q_ts_key         = "\"key\":", string ;       (* template:slot:<name> *)
+q_ts_name        = "\"name\":", string ;       (* bare slot name, e.g. brand_accent *)
+q_ts_type        = "\"type\":", slot_type ;
+q_ts_phase       = "\"phase\":", "\"", phase_name, "\"" ;
+q_ts_edge_kind   = "\"edge_kind\":", slot_edge_kind ;
+q_ts_default     = "\"default\":", string ;
+q_ts_unit        = "\"unit\":", slot_unit ;
+q_ts_kit_id      = "\"kit_id\":", string ;     (* registry id, or "*" for shared *)
+q_ts_description = "\"description\":", string ;
+q_ts_css_vars    = "\"css_vars\":", string_array ; (* CSS custom property names this slot drives *)
+
+slot_type = "\"css_color\"" | "\"css_var_block\"" | "\"app_name\"" | "\"url\""
+          | "\"number\"" | "\"port\"" | "\"string\"" | "\"array\""
+          | "\"boolean\"" | "\"template_ref\"" | "\"feature_list\"" ;
+
+slot_edge_kind = "\"@provides\"" | "\"@configures\"" | "\"@requires\"" | "\"@overrides\"" ;
+
+(* SC-13: slot type ↔ unit coupling:
+     css_color | css_var_block       → brand_token | layout_token
+     app_name | url                  → identity_token
+     port | number                   → connection_token
+     feature_list | array            → feature_token
+     string                          → content_token | identity_token
+     boolean                         → feature_token | connection_token
+     template_ref                    → content_token *)
+slot_unit = "\"brand_token\"" | "\"layout_token\"" | "\"identity_token\""
+          | "\"connection_token\"" | "\"feature_token\"" | "\"content_token\"" ;
+
+(* ── Gram channel contract (DOCUMENTATION ONLY) ───────────────────────── *)
+(* These productions describe the semantics of each channel. They are NOT
+   reachable from `document` and MUST NOT be wired into a parser. Their
+   job is to be co-located with the grammar so SC-4 can reference them and
+   so human readers see shape and semantics in one file. *)
+
+channel_contract =
+    unigram_contract | bigram_contract | trigram_contract | quadgram_contract
+  | coarse_gram_contract | function_gram_contract | tool_gram_contract ;
+
+unigram_contract =
+    "channel=unigram", "width=1", "role=semantic_address", "phase=Pop",
+    "unit=semantic_address_layer",
+    "address=unigram:<lemma>",
+    "consumption=single-token semantic address: lemma resolves to key, word_to_atom:<cue>, atom:<name>, atom_phase_contract:<name>" ;
+
+bigram_contract =
+    "channel=bigram", "width=2", "role=context_association", "phase=Wo",
+    "unit=context_association_evidence",
+    "address=bigram:<left> <right>",
+    "consumption=ordered adjacent pair; direction carries meaning — (left,right) is not (right,left)" ;
+
+trigram_contract =
+    "channel=trigram", "width=3", "role=context_association", "phase=Wo",
+    "unit=context_association_evidence",
+    "address=trigram:<t1> <t2> <t3>",
+    "consumption=three-token phrase template; wider ordered context than bigram, sparser evidence" ;
+
+quadgram_contract =
+    "channel=quadgram", "width=4", "role=context_association", "phase=Wo",
+    "unit=context_association_evidence",
+    "address=quadgram:<t1> <t2> <t3> <t4>",
+    "consumption=four-token phrase template; highest specificity, lowest recall" ;
+
+coarse_gram_contract =
+    "channel=coarse_gram", "role=structural_shape", "phase=Yax",
+    "unit=coarse_ngram_structure",
+    "address=coarse_gram:<c|f:word|ctrl:word> ...",
+    "consumption=token-class skeleton (c=content word, f:x=function word, ctrl:x=control word); matches word-order structure when exact grams miss" ;
+
+function_gram_contract =
+    "channel=function_gram", "role=function_word_structure", "phase=Yax",
+    "unit=function_word_channel",
+    "address=function_gram:<glue-token> ...",
+    "consumption=grammar-glue and control pivots resolve to XCFE operator authority (CAUSE, VERIFY, ...)" ;
+
+tool_gram_contract =
+    "channel=tool_gram", "role=tool_dispatch_intent", "phase=Sek",
+    "unit=tool_dispatch_channel",
+    "address=tool_gram:<verb> ...",
+    "consumption=dispatch intent routes to tool keys k_rpc_<method> / k_mcp_<method> via route_hint:tool_gram:<gram>" ;
+
+(* ── Gram channel vocabulary ─────────────────────────────────────────── *)
+gram_class = "unigram" | "bigram" | "trigram" | "quadgram"
+           | "coarse_gram" | "function_gram" | "tool_gram" ;
+gram_role  = "semantic_address" | "context_association" | "structural_shape"
+           | "function_word_structure" | "tool_dispatch_intent" ;
+phase_name = "Pop" | "Wo" | "Yax" | "Sek" | "Ch'en" | "Xul" ;
+
+(* ── Key-store addressing (runtime memory) ────────────────────────────── *)
+key_store_key =
+    gram_scope_key | assoc_key | route_hint_key | prompt_key | prompt_ngram_key
+  | word_assoc_key | lexicon_key | similarity_key | synonym_key | atom_key
+  | greeting_key | lingo_key | lingo_blend_key | style_profile_key
+  | template_slot_key ;
+
+gram_scope_key    = "gram:", gram_class, ":", gram_text ;
+assoc_key         = "assoc:", gram_class, ":", gram_text ;
+route_hint_key    = "route_hint:tool_gram:", gram_text | "route_hint:track:", gram_text ;
+prompt_key        = "prompt:", epoch_ms, "-", sequence ;
+prompt_ngram_key  = "prompt_ngram:", gram_text ;
+word_assoc_key    = "word_assoc:", token, "|", relation, "|", token ;
+lexicon_key       = "lexicon:", lemma | "unigram:", lemma | "key:", lemma | "book:", lemma ;
+similarity_key    = "word_similarity:", lemma ;
+synonym_key       = "synonym:", lemma ;
+atom_key          = "word_to_atom:", cue | "atom:", atom | "atom_phase_contract:", atom ;
+greeting_key      = "greeting:observed:", greeting_form
+                  | "greeting:last_user"
+                  | "greeting:variant:", synthesized_word ;
+lingo_key         = "mx2lm:lingo:", lingo_token ;
+lingo_blend_key   = "mx2lm:lingo_blend:", synthesized_word ;
+style_profile_key = "mx2lm:style_profile:v1" ;
+template_slot_key = "template:slot:", slot_name ;   (* SC-13: key of a template_slot_row *)
+
+(* ── Prompt archive record (gram-store layout per submitted prompt) ──── *)
+(* Every submitted prompt is broken into typed gram channels and archived:
+   prompt:<epoch>-<seq> scopes one archive; each channel row keeps class,
+   count and gram text with its phase and unit.
+   NOTE: this is the one non-JSON record shape in the grammar; it is a
+   human-readable archive line, not a stored key-store record. *)
+prompt_archive_record =
+    prompt_scope_key, ":", gram_class, ":", ordinal,
+    " -> ", gram_class, "|", count, "|", gram_text,
+    " @ ", phase_name, " unit=", gram_unit, " corpus=", corpus_name ;
+
+prompt_scope_key = prompt_key ;
+gram_unit = "semantic_address_layer" | "context_association_evidence"
+          | "coarse_ngram_structure" | "function_word_channel" | "tool_dispatch_channel"
+          | "predication_sequence" | "style_adaptation_profile" ;
+corpus_name = "definitions_and_relations" | "xcfe_control_program" ;
+
+(* ── Control flow (sugar) ─────────────────────────────────────────────── *)
+(* Control words are first-class *flow* operators, not a bag of operator
+   tokens: a control clause reads like English and lowers to an executable
+   XCFE control node (@if/@then/@else) with every construct bound to a K'UHUL
+   phase. The vocabulary and its contract bounds are declared here; the
+   per-operator values (authority, lowering, phase, block role, arity) are
+   carried by control_flow_row records emitted by the runtime, and
+   tools/grammar/mini_transpilers.py control-check validates the artifact
+   against this contract.
+
+   SC-8: control_step is a projection of control_flow_row plus positional
+   context. To avoid silent drift, both are declared as the same shared
+   field set and control_step adds only {position, operand, operand_lhs}. *)
+
+(* Shared operator-contract field set. Used verbatim by both row forms. *)
+control_op_fields =
+      q_cf_word, ",", q_cf_key, ",", q_cf_operator, ",", q_cf_book, ",",
+      q_cf_role, ",", q_cf_class, ",", q_cf_requires, ",", q_cf_xcfe, ",", q_cf_phase, ",",
+      q_cf_authority_phase, ",", q_cf_emit_phase, ",",
+      q_cf_block, ",", q_cf_arity, ",", q_cf_sugar ;
+
+control_flow_row = "{", control_op_fields, "}" ;
+
+q_cf_word            = "\"word\":", control_word ;
+q_cf_key             = "\"key\":", string ;
+q_cf_operator        = "\"operator\":", string ;
+q_cf_book            = "\"book\":", string ;
+q_cf_role            = "\"role\":", string ;
+q_cf_class           = "\"class\":", xcfe_node_class ;
+q_cf_requires        = "\"requires\":", string_array ;
+q_cf_xcfe            = "\"xcfe_op\":", control_xcfe_op ;
+q_cf_phase           = "\"phase\":", control_phase ;
+q_cf_authority_phase = "\"authority_phase\":", control_phase ;
+q_cf_emit_phase      = "\"emit_phase\":", control_phase ;
+q_cf_block           = "\"block_role\":", control_block_role ;
+q_cf_arity           = "\"arity\":", control_arity ;
+q_cf_sugar           = "\"sugar\":", string ;
+
+(* A control_step is the shared operator contract PLUS positional/operand
+   context. It intentionally does not re-list the shared fields. *)
+control_step =
+    "{",
+      control_op_fields, ",",
+      q_cs_position, ",", q_cs_operand, ",", q_cs_operand_lhs,
+    "}" ;
+
+q_cs_position    = "\"position\":", integer ;
+q_cs_operand     = "\"operand\":", string ;
+q_cs_operand_lhs = "\"operand_lhs\":", string ;
+
+control_plan_row =
+    "{",
+      q_cp_schema, ",", q_cp_form, ",", q_cp_structured, ",", q_cp_condition, ",",
+      q_cp_steps,
+    "}" ;
+q_cp_schema     = "\"schema\":", "\"key.grammar.control_flow_plan.v1\"" ;
+q_cp_form       = "\"form\":", control_form ;
+q_cp_structured = "\"structured\":", boolean ;
+q_cp_condition  = "\"condition\":", string ;
+q_cp_steps      = "\"steps\":", "[", [ control_step, { ",", control_step } ], "]" ;
+
+control_form =
+    "if/then" | "if/then/else" | "when/then" | "when/then/else"
+  | "compare" | "flat" | "none" ;
+
+(* ── Control-flow sugar: clauses read like English ────────────────────── *)
+control_clause =
+    conditional_clause | temporal_clause | iteration_clause
+  | origin_clause | comparison_clause | query_clause ;
+
+conditional_clause = "if", condition, "then", consequence, [ "else", alternative ] ;
+temporal_clause    = "when", condition, "then", consequence, [ "else", alternative ] ;
+iteration_clause   = "for", "each", item, "in", collection ;
+origin_clause      = "from", source, [ "as", role ] ;
+comparison_clause  = expression, comparison_word, expression ;
+query_clause       = ( "who" | "why" | "how" ), expression ;
+
+comparison_word = "equals" | "equal" | "is" | "are" ;
+condition   = expression ;
+consequence = expression ;
+alternative = expression ;
+expression  = token, { token } ;
+item        = token ;
+collection  = token, { token } ;
+source      = token, { token } ;
+role        = token, { token } ;
+
+(* Lowering: a structured control clause becomes an XCFE control node.
+   SC-11: string_object is shallow — string-valued fields only, no nesting. *)
+xcfe_control_node =
+    "{", "\"@if\":", string, ",", "\"@then\":", xcfe_branch,
+    [ ",", "\"@else\":", xcfe_branch ], "}" ;
+xcfe_branch  = string | xcfe_op_node | "null" ;
+xcfe_op_node = "{", "\"@fn\":", string, ",", "\"@args\":", string_object, "}" ;
+string_object = "{", [ string_field, { ",", string_field } ], "}" ;
+string_field  = string, ":", string ;
+
+(* Operator vocabulary + contract bounds. *)
+control_word =
+    "if" | "else" | "then" | "when" | "how" | "who" | "why" | "for"
+  | "from" | "as" | "equals" | "where" | "is" | "are" | "equal"
+  | "and" | "or" | "not" | "because" | "requires" | "depends"
+  | "evidence" | "shows" | "proves" | "verify" | "check" | "assert" ;
+control_phase = "Pop" | "Wo" | "Yax" | "Sek" | "Ch'en" | "Xul" ;
+control_xcfe_op =
+    "@if" | "@then" | "@else" | "@fn" | "@node" | "@op"
+  | "@for" | "@from" | "@as" | "@where" | "@and" | "@or" | "@not"
+  | "@direct" | "@cause" ;
+control_block_role = "open" | "mid" | "close" | "none" ;
+control_arity = "1" | "2" ;
+
+(* ── XCFE Node ISA ────────────────────────────────────────────────────── *)
+(* Class, operator, flow phase and authority phase are independent
+   coordinates. The invariants are:
+     class(op) != none                       — every op resolves to a class
+     CanonicalPhase(class) != none           — every class has an authority phase
+     authority_phase(op) = CanonicalPhase(class(op))   — always
+     flow_phase(op) in C6                    — where the construct appears
+     flow_phase(op) = authority_phase(op) is LEGAL BUT NEVER REQUIRED
+   XcfeNodeClass is deliberately not the Relation ISA family set, and there is
+   deliberately no Policy class: operation authority is XCFE's own gate
+   (authorize_phase_transition + xcfe_required edges), not a node class.
+   The canonical class -> phase mapping is defined once in
+   src/kuhul/xcfe_node_class.h; this grammar declares the vocabulary. *)
+
+xcfe_node_class =
+    "CONDITION" | "ROUTING" | "CAUSAL" | "STRUCTURE"
+  | "SELECTION"
+  | "EXECUTION" | "CAPABILITY" | "TRANSFORM"
+  | "VERIFICATION" | "CONSEQUENCE"
+  | "COMMIT"
+  | "MEMORY" | "NEGATION" | "KUHUL_RUNTIME" ;
+
+(* CanonicalPhase(class): the phase where the class's semantics are governed.
+   SC-12: written as structured pairs so consumers need no string splitting. *)
+xcfe_class_authority =
+    "{", "canonical_phase", ":", "[",
+      xcfe_class_phase_pair, { ",", xcfe_class_phase_pair },
+    "]", "}" ;
+xcfe_class_phase_pair =
+    "{", "\"class\":", "\"", xcfe_node_class, "\"", ",",
+         "\"phase\":", "\"", phase_name, "\"", "}" ;
+
+(* ── Terminals ────────────────────────────────────────────────────────── *)
+string_array = "[", [ string, { ",", string } ], "]" ;
+boolean = "true" | "false" ;
+string = ? JSON string ? ;
+number = ? JSON number ? ;
+integer = digit, { digit } ;
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+gram_text = ? ordered gram text; token order is semantic ? ;
+lemma = ? lowercase dictionary lemma ? ;
+token = ? single lexical token ? ;
+cue = ? atom cue token ? ;
+atom = ? semantic atom name ? ;
+relation = ? relation verb, e.g. @related_to ? ;
+epoch_ms = ? milliseconds since UNIX epoch ? ;
+sequence = ? per-process prompt sequence number ? ;
+ordinal = ? 1-based channel row ordinal ? ;
+count = ? occurrence count, same as number ? ;
+greeting_form = ? sanitized user greeting form ? ;
+lingo_token = ? sanitized learned lingo token (underscores for spaces) ? ;
+synthesized_word = ? runtime-blended associative word ? ;
+slot_name = ? bare slot name, e.g. brand_accent ? ;
+
+(* ══════════════════════════════════════════════════════════════════════ *)
+(* ── Side-constraint block (SC) ──────────────────────────────────────── *)
+(* Cross-field invariants that the productions above only imply. These
+   are not parse rules; they are validation rules that
+   tools/grammar/mini_transpilers.py must enforce on emitted artifacts.
+   Each SC names its scope, the fields it binds, and the predicate. *)
+(* ══════════════════════════════════════════════════════════════════════ *)
+
+(* SC-1  typed_gram ↔ channel_contract agreement.
+   scope:   gram_channel
+   binds:   gram_class (from key), typed_gram.width, typed_gram.role,
+            typed_gram.phase, typed_gram.position
+   pred:    For every gram_channel key C and every typed_gram g in its array:
+              g.role  = contract(C).role
+              g.phase = contract(C).phase
+              if C ∈ {unigram,bigram,trigram,quadgram}:
+                  g.width = contract(C).width
+              if C = coarse_gram:
+                  g.position MUST be absent
+              if C ∈ {function_gram, tool_gram}:
+                  g.width and g.position are caller-defined
+   reason:  Stops a width=1 row from appearing under a "bigram" key, and
+            stops positional evidence from polluting coarse structural
+            skeletons. *)
+
+(* SC-2  phase partition of typed grams.
+   scope:   any row carrying typed_gram rows
+   binds:   gram_class, typed_gram.phase
+   pred:    C6 phase sets are disjoint per channel family:
+              {unigram}                      → {Pop}
+              {bigram,trigram,quadgram}      → {Wo}
+              {coarse_gram,function_gram}    → {Yax}
+              {tool_gram}                    → {Sek}
+              (Ch'en, Xul carry no typed gram phase today)
+   reason:  Makes channel→phase total, and prevents a future channel from
+            silently borrowing a phase that belongs to another family. *)
+
+(* SC-3  lexicon_row key/unit coupling.
+   scope:   lexicon_row
+   binds:   q_unit, q_key
+   pred:    q_unit = "unigram"  ⇒  q_key matches "unigram:<lemma>"
+                                    OR "key:<lemma>"
+                                    OR "lexicon:<lemma>"
+                                    OR "book:<lemma>"
+            i.e. the key family MUST address a single lemma.
+   reason:  q_unit is the only hard-coded unit literal in a q_* production;
+            this constraint is what makes that safe. *)
+
+(* SC-4  gram_scope_key / assoc_key reachability.
+   scope:   key_store_key
+   binds:   gram_class appearing in gram_scope_key / assoc_key
+   pred:    gram_class ∈ channel_contract keys (the documentation block).
+            Any class appearing in a key MUST have a matching contract row.
+   reason:  Prevents emitting keys for channels that were never defined,
+            and keeps the documentation block load-bearing. *)
+
+(* SC-5  route_hint:tool_gram well-formedness.
+   scope:   route_hint_key
+   binds:   gram_text following "route_hint:tool_gram:"
+   pred:    The prefix before the first space MUST equal the value of
+            q_cf_xcfe on some control_flow_row whose xcfe_op ∈
+            { "@direct", "@cause" }.
+   reason:  A tool dispatch route without a matching dispatch-intent
+            operator is dead weight; this forces the route to point at a
+            real lowering. *)
+
+(* SC-6  prompt_archive_record ordinal monotonicity.
+   scope:   prompt_archive_record*
+   binds:   prompt_scope_key, gram_class, ordinal
+   pred:    Within one prompt_scope_key, ordinals for a given gram_class
+            are 1-based, strictly increasing, gap-free.
+   reason:  The ordinal is the only ordering evidence for channel rows in
+            an archive; a gap makes it ambiguous which row was dropped. *)
+
+(* SC-7  greeting_phase_entry phase/variant/kind agreement.
+   scope:   greeting_phase_entry
+   binds:   greeting_phase, greeting_variant, greeting_kind
+   pred:    (a) greeting_phase ∈ C6 (phase_name).
+            (b) greeting_variant present ⇒
+                  (phase, variant, kind) ∈
+                    { ("Pop", "reactive_mirror",     "reactionary"),
+                      ("Yax", "synthesized_greeting","synthesized") }
+            (c) greeting_variant present ⇒ kind is the matching one above.
+            (d) greeting_variant absent  ⇒ kind ∈
+                    {canonical, learned, associative, status,
+                     confirmatory, recall}
+   reason:  Variants are sub-modes, not phases. This is what keeps
+            "phase ∈ C6" a total predicate for greetings. *)
+
+(* SC-8  control_flow_row / control_step field-set identity.
+   scope:   control_flow_row, control_step
+   binds:   control_op_fields
+   pred:    control_step.op_fields == control_flow_row.op_fields
+            (identical set, identical value-domains; control_step adds
+             only {position, operand, operand_lhs}).
+   reason:  The shared production is the enforcement mechanism; this SC
+            makes the intent explicit for readers and for any generated
+            validator. *)
+
+(* SC-9  XCFE authority coherence.
+   scope:   control_flow_row, control_step, xcfe_class_authority
+   binds:   xcfe_op (q_cf_xcfe), class, authority_phase, phase, emit_phase
+   pred:    (a) class(op) ∈ xcfe_node_class.
+            (b) authority_phase(op) = phase such that
+                  (class(op), phase) ∈ xcfe_class_authority.
+            (c) phase(op) ∈ control_phase (C6).
+            (d) emit_phase(op) ∈ control_phase (C6).
+            (e) phase(op) = authority_phase(op) is legal, not required.
+   reason:  Restates the XCFE ISA invariants as a checkable predicate. *)
+
+(* SC-10 control arity ↔ block_role.
+   scope:   control_flow_row, control_step
+   binds:   control_arity, control_block_role
+   pred:    block_role = "open" | "mid"  ⇒  arity = "1"
+            block_role = "close"         ⇒  arity = "2"
+            block_role = "none"          ⇒  arity ∈ {"1","2"}
+   reason:  Openers and middles are unary; closers bind LHS+RHS. *)
+
+(* SC-11 string_object shallow-well-formedness.
+   scope:   xcfe_op_node
+   binds:   string_object
+   pred:    Every value in string_object is a JSON string.
+            No nested objects, no arrays, no nulls, no numbers.
+   reason:  @fn arguments are flat string fields by construction; a nested
+            value means someone is trying to smuggle a node through @args. *)
+
+(* SC-12 xcfe_class_authority totality.
+   scope:   xcfe_class_authority
+   binds:   xcfe_class_phase_pair
+   pred:    For every c ∈ xcfe_node_class there is exactly one
+            (c, p) ∈ xcfe_class_authority, and p ∈ phase_name.
+   reason:  SC-9(b) is only computable if this mapping is total and
+            functional; this SC is what makes SC-9 total. *)
+
+(* SC-13 template_slot_row type ↔ unit coupling.
+   scope:   template_slot_row
+   binds:   slot_type, slot_unit
+   pred:    css_color | css_var_block  →  brand_token | layout_token
+            app_name | url             →  identity_token
+            port | number              →  connection_token
+            feature_list | array       →  feature_token
+            string                     →  content_token | identity_token
+            boolean                    →  feature_token | connection_token
+            template_ref               →  content_token
+            (no other (type, unit) pairs are valid)
+   also:    template_slot_key = "template:slot:" + q_ts_name value
+            q_ts_kit_id = "*" means the slot is shared across all kits;
+            kit-specific slots carry the registry kit id instead.
+   reason:  Mirrors SC-3 for slots: the unit field is not free text, it
+            must reflect the semantic category of the type it carries.
+            A port with unit=brand_token is a mis-classification. *)
+
+(* ── End side-constraint block ───────────────────────────────────────── *)

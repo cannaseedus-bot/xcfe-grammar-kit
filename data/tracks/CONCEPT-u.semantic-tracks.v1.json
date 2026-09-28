@@ -1,0 +1,57 @@
+{
+  "@no-eval": true,
+  "id": "CONCEPT-µ",
+  "description": "Concept modeling lane — builds and links concept maps, abstractions, and typed conceptual relations",
+  "phase": "Yax",
+  "category": "cognitive",
+  "confidence": 1.0,
+  "governs": [
+    "concept", "concepts", "conceptual", "concept map", "concept-map",
+    "map concepts", "abstraction", "taxonomy", "ontology", "semantic map",
+    "knowledge map", "node relation", "relationship graph", "schema concept",
+    "term mapping", "definition graph", "hyponym", "hypernym", "co-hyponym",
+    "is-a", "part-of", "subsumption", "semantic folding", "CONCEPT:", "@concept"
+  ],
+  "capabilities": [
+    "concept-extraction", "concept-normalization", "concept-map-construction",
+    "hierarchy-linking", "typed-relation-binding", "ontology-bridge",
+    "graph-structured-concept-synthesis", "taxonomic-containment-modeling",
+    "cohyponym-adjacency-mapping", "contextual-meronym-linking"
+  ],
+  "semantic_folding_profile": {
+    "model_axis": "taxonomic_subsumption_geometry",
+    "captures": ["hyponymy", "synonymy", "co_hyponymy", "partial_meronymy"],
+    "limitations": ["no_predication", "no_word_order_syntax", "no_reliable_negation", "weak_antonym_separation", "no_native_control_flow_logic"],
+    "boolean_ops_scope": "fingerprint_overlap_ops_not_program_control",
+    "required_companions": ["word_sense_layer", "coarse_ngram_layer", "sequence_predication_layer"]
+  },
+  "pattern_registry": {
+    "insert_key": "CONCEPT:",
+    "invoke_node": "@concept",
+    "wrapper": "<concept>{graph}</concept>",
+    "fallback": "<concept>{input}</concept>"
+  },
+  "relations": [
+    { "target": "REASON-µ",       "verb": "@delegates_to",      "directed": true },
+    { "target": "INFER-µ",        "verb": "@supports",    "directed": true },
+    { "target": "ORCH-µ",         "verb": "@produces", "directed": true },
+    { "target": "Librarian",      "verb": "@delegates_to",  "directed": true },
+    { "target": "WEB-RESEARCH-µ", "verb": "@delegates_to",  "directed": true },
+    { "target": "Mx2LM",          "verb": "@redirect",     "directed": true }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",            "key": "concept_prompt"     },
+    { "phase": "Wo",    "op": "normalize_concepts"                              },
+    { "phase": "Yax",   "op": "build_concept_graph"                             },
+    { "phase": "Sek",   "op": "bind_concept_relations"                          },
+    { "phase": "Ch'en", "op": "verify_concept_constraints"                      },
+    { "phase": "Xul",   "op": "gramWrite",           "scope": "concept_result"   }
+  ],
+  "sandbox": {
+    "gram_ns": "CONCEPT-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": ["gramRead", "gramWrite", "semantic_graph:read", "route:delegate", "route:verify", "route:aggregate"],
+    "ports": [],
+    "coordinator": false
+  }
+}

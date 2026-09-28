@@ -1,0 +1,129 @@
+{
+  "@no-eval": true,
+  "id": "FACTORY-µ",
+  "description": "Factory micronaut — user-facing interface to the micronaut registry. Factory is the attention-field constructor: it creates/evolves the structural materials (micronauts, capabilities, governs, key-store associations, gram geometry) that Yax/GPU attention later resolves over. Factory does not perform attention — it learns and maintains the material attention resolves over. Create/evolve are fully gated: propose_create/propose_evolve return a FactoryCandidate snapshot without touching the registry; commit(candidate, CommitAuthority) writes under XulGate authorization. Phase map: create→Wo, evolve→Yax, propose→Wo, verify→Ch'en, commit→Xul, list/read→Pop, edit/patch→Sek, delete→Xul.",
+  "phase": "Wo",
+  "category": "structural",
+  "confidence": 1.0,
+  "governs": [
+    "create", "evolve", "factory", "propose", "commit", "spawn", "build", "make",
+    "micronaut", "registry", "capability", "capabilities", "governs", "structural",
+    "new micronaut", "register", "factory-µ", "FACTORY:", "@factory",
+    "key store", "key-store", "record key", "lookup key", "key bank"
+  ],
+  "capabilities": [
+    "propose-create",
+    "propose-evolve",
+    "commit-candidate",
+    "list-micronauts",
+    "read-micronaut",
+    "edit-capabilities",
+    "patch-confidence",
+    "delete-micronaut",
+    "keystore-record",
+    "keystore-lookup",
+    "keystore-list",
+    "ui-card-display",
+    "gram-store-persistence",
+    "aiml-factory-patterns"
+  ],
+  "attention_field_role": {
+    "description": "Factory builds the attention-field structures consumed by Yax/GPU attention. Structural learning and attention-prior learning are two distinct jobs that share one Factory instance.",
+    "structural_learning":       ["micronauts", "capabilities", "governs", "relations", "folds"],
+    "attention_prior_learning":  ["vector_meta", "static_weight", "key_store", "associations"],
+    "lifecycle": "Experience → Factory → B → Unfold → F_Q → GPU Attention → Yax admission",
+    "invariant": "propose_create/evolve never touch reg_ directly; only commit(FactoryCandidate, CommitAuthority) writes to B"
+  },
+  "gram_key_schema": {
+    "propose":   "factory:propose:{id}",
+    "commit":    "factory:commit:{id}",
+    "status":    "factory:status:{id}",
+    "key_store": "factory:key:{hash}",
+    "list":      "factory:list:last"
+  },
+  "ui_card_schema": {
+    "@kind":             "factory_card.v1",
+    "id":                "micronaut id",
+    "op":                "propose_create | propose_evolve | commit | list | read | edit | delete",
+    "phase":             "Wo | Yax | Sek | Ch'en | Xul | Pop",
+    "candidate_op":      "Create | Evolve",
+    "scope":             "micronaut-registry",
+    "proposal_identity": "create:<id> | evolve:<id>",
+    "result_ok":         "boolean",
+    "result_message":    "string",
+    "card_title":        "optional display title",
+    "card_hint":         "optional description"
+  },
+  "pattern_registry": {
+    "insert_key": "FACTORY:",
+    "invoke_node": "@factory",
+    "wrapper": "<mx2lm>factory-u op={op} phase={phase} {text}</mx2lm>",
+    "fallback": "<mx2lm>factory-u {input}</mx2lm>"
+  },
+  "tool_call_profile": {
+    "tools": ["propose_create", "propose_evolve", "factory_commit", "factory_advisor_commit", "list_micronauts", "factory_status"],
+    "propose_create_params":          ["id", "description", "primary_phase", "capabilities", "governs"],
+    "propose_evolve_params":          ["id", "new_capabilities", "new_governs"],
+    "commit_params":                  ["candidate_op", "candidate_id", "scope", "proposal_identity"],
+    "factory_advisor_commit_params":  ["micronaut_id", "accepted_capabilities", "accepted_governs"],
+    "list_params":                    [],
+    "status_params":                  ["id"]
+  },
+  "relations": [
+    { "target": "Coordinator", "verb": "@delegates_to",  "directed": true },
+    { "target": "Mx2LM",       "verb": "@related_to",    "directed": false },
+    { "target": "MEMORY-µ",    "verb": "@related_to",    "directed": false },
+    { "target": "CONTROL-µ",   "verb": "@related_to",    "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",         "key": "factory:list:last",
+      "note": "read current registry state for card display" },
+    { "phase": "Pop",   "op": "list_micronauts",  "note": "enumerate registry entries" },
+    { "phase": "Wo",    "op": "propose_create",   "note": "build FactoryCandidate for a new micronaut without touching reg_" },
+    { "phase": "Yax",   "op": "propose_evolve",   "note": "read current entry, compute merged snapshot, return FactoryCandidate" },
+    { "phase": "Sek",   "op": "edit_capabilities","note": "replace capability set (Sek=restructure)" },
+    { "phase": "Ch'en", "op": "verify_candidate", "note": "advisor verifies+rewrites seed caps via Invoke-AdvisorEvolveQuery; factory_advisor_commit carries the signed-off set" },
+    { "phase": "Xul",   "op": "commit_candidate", "scope": "micronaut-registry", "authority": "XulGate",
+      "note": "factory.commit(candidate, CommitAuthority) — validates scope==candidate.scope && identity==candidate.proposal_identity" },
+    { "phase": "Xul",   "op": "delete_micronaut", "scope": "local", "gate": "confidence_floor:0.7" }
+  ],
+  "commit_protocol": {
+    "propose":              "Factory::propose_create(id,...) or propose_evolve(id,...) → optional<FactoryCandidate>",
+    "authorize":            "XulGate::authorize_commit(CommitDecision, scope, proposal_identity) → optional<CommitAuthority>",
+    "commit":               "Factory::commit(FactoryCandidate, CommitAuthority) → FactoryResult",
+    "identity_binding":     "authority.proposal_identity() must equal candidate.proposal_identity ('create:<id>' or 'evolve:<id>')",
+    "advisor_evolve_path":  "Miss → apply_miss_factory_mutation computes seed caps → pending_advisor_verify=true → PS: Invoke-AdvisorEvolveQuery(seed) → advisor rewrites caps → factory_advisor_commit RPC → propose_evolve(advisor_caps) → XulGate → commit",
+    "advisor_fail_closed":  "Advisor offline or empty delta → factory_advisor_commit not called → no commit; micronaut unchanged",
+    "cap_rewrite":          "Advisor is a semantic rewriter, not a filter. Synthetic caps (miss::*, needs_fold:*, research_pressure:*) are rejected; advisor authors precise semantic caps"
+  },
+  "unfold_miss_pipeline": {
+    "law":              "Unfold(B,Q) → F_Q → { Projection(F_Q)=LFM, Attention(F_Q)=Yax/GPU, RepairProposal(F_Q)=Advisor }",
+    "authorities":      { "fold_graph_parse": "semantic evidence", "LFM": "semantic projector", "Advisor": "repair proposal" },
+    "lfm_constraint":   "LFM may explain F_Q; LFM may not enlarge F_Q",
+    "set_laws":         {
+      "known_LFM":       "Known_LFM ⊆ Resolved(F_Q) — candidates with evidence_count>=2",
+      "uncertain_LFM":   "Uncertain_LFM ⊆ LowEvidence(F_Q) — candidates with evidence_count=1",
+      "unresolved_LFM":  "Unresolved_LFM ⊆ Unresolved(F_Q) — unresolved is absence from current field, not proof of KB defect",
+      "no_fabrication":  "unresolved ≠ automatically needs updating; Advisor determines whether ΔB≠0"
+    },
+    "lfm_output_schema": { "summary": "string", "known": "string[]", "uncertain": "string[]", "unresolved": "string[]", "update_candidates": "string[] (advisory only)", "question": "Q_gap — one question to reduce principal uncertainty" },
+    "advisor_receives":  "Q_gap from LFM (for knowledge miss) or seed caps (for pending_advisor_verify)",
+    "learning_law":      "Unresolved_t(x) ∧ VerifiedLearning(x) ⟹ Resolved_{t+n}(x)"
+  },
+  "memory_patterns": [
+    "factory:propose:*",
+    "factory:commit:*",
+    "factory:status:*",
+    "factory:key:*",
+    "factory:list:last"
+  ],
+  "sandbox": {
+    "gram_ns":          "FACTORY",
+    "manifest_access":  ["micronaut", "kuhul", "words"],
+    "effects":          ["gramRead", "gramWrite", "micronaut:propose", "micronaut:commit", "micronaut:delete"],
+    "key_prefix_allow": ["factory:"],
+    "key_prefix_deny":  ["xcfe.", "fold.", "ngram:"],
+    "ports":            [],
+    "coordinator":      false
+  }
+}

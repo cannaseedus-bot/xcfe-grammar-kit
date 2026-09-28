@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:khanary:schema:micronaut-track-types:1",
+  "title": "KHANARY Micronaut Track Types",
+  "description": "Shared types for micronaut semantic track definitions.",
+  "type": "object",
+  "$defs": {
+    "PhaseName": {
+      "type": "string",
+      "enum": ["Pop", "Wo", "Yax", "Sek", "Ch'en", "Chen", "Xul"]
+    },
+    "RelationVerb": {
+      "type": "string",
+      "description": "Closed relation ISA with compatibility aliases. Prefer canonical relation tokens.",
+      "enum": [
+        "@is_a",
+        "@part_of",
+        "@has_a",
+        "@has_part",
+        "@has_property",
+        "@value",
+        "@possesses",
+        "@related_to",
+        "@contains",
+        "@declares",
+        "@defines",
+        "@causes",
+        "@prevents",
+        "@enables",
+        "@supports",
+        "@contradicts",
+        "@evidence_for",
+        "@requires",
+        "@produces",
+        "@depends_on",
+        "@imports",
+        "@uses",
+        "@accesses",
+        "@reads",
+        "@samples",
+        "@returns",
+        "@context",
+        "@previous",
+        "@next",
+        "@annotates",
+        "@via",
+        "@governs",
+        "@redirect",
+        "@calls",
+        "@delegates_to",
+        "@return_to",
+        "@resumes",
+        "@call",
+        "@delegate",
+        "@is_type",
+        "@instance_of",
+        "@has_component",
+        "@has_feature",
+        "@property_of",
+        "@owns",
+        "@own",
+        "@possess",
+        "@owner_of",
+        "@compose",
+        "@eval",
+        "@verify",
+        "@research",
+        "@invoke",
+        "@relate",
+        "@aggregate",
+        "@mx2lm",
+        "@app"
+      ]
+    },
+    "RelationEdge": {
+      "type": "object",
+      "required": ["target", "verb"],
+      "properties": {
+        "target": { "type": "string", "minLength": 1 },
+        "verb": { "$ref": "#/$defs/RelationVerb" },
+        "directed": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "HasARelation": {
+      "type": "object",
+      "required": ["owner", "member", "relation"],
+      "properties": {
+        "owner": { "type": "string" },
+        "member": { "type": "string" },
+        "relation": {
+          "type": "string",
+          "enum": ["has_a", "contains", "is_type_of", "instance_of"]
+        },
+        "ownership": {
+          "type": "string",
+          "enum": ["owned", "shared", "weak"],
+          "default": "owned"
+        },
+        "cardinality": {
+          "type": "string",
+          "enum": ["1:1", "1:n", "n:1", "m:n"]
+        },
+        "rule": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "TruthConditionalRule": {
+      "type": "object",
+      "required": ["proposition", "truth_when"],
+      "properties": {
+        "proposition": { "type": "string" },
+        "truth_when": { "type": "string" },
+        "false_when": { "type": "string" },
+        "evidence_required": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "QASemanticsProfile": {
+      "type": "object",
+      "properties": {
+        "modes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "reading_comprehension",
+              "closed_book",
+              "closed_domain",
+              "open_domain"
+            ]
+          }
+        },
+        "approaches": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "rule_based",
+              "statistical",
+              "hybrid",
+              "knowledge_graph"
+            ]
+          }
+        },
+        "answer_types": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "fact",
+              "list",
+              "definition",
+              "how",
+              "why",
+              "hypothetical",
+              "semantically_constrained",
+              "cross_lingual"
+            ]
+          }
+        },
+        "truth_model": {
+          "type": "string",
+          "enum": ["truth_conditional", "evidence_scored", "hybrid"]
+        },
+        "ontology_required": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "FoldEntry": {
+      "type": "object",
+      "required": ["phase", "op"],
+      "properties": {
+        "phase": { "$ref": "#/$defs/PhaseName" },
+        "op": { "type": "string", "minLength": 1 },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "key": { "type": "string" },
+        "scope": { "type": "string" },
+        "delegate": { "type": "string" },
+        "note": { "type": "string" },
+        "gate": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "ContrastSetItem": {
+      "type": "object",
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "description": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ContrastSet": {
+      "type": "object",
+      "required": ["id", "slot", "items"],
+      "properties": {
+        "id": { "type": "string" },
+        "slot": { "type": "string" },
+        "context": { "type": "string" },
+        "items": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/ContrastSetItem" }
+        },
+        "compare_axes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Sandbox": {
+      "type": "object",
+      "properties": {
+        "gram_ns": { "type": "string" },
+        "manifest_access": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "effects": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "ports": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1, "maximum": 65535 }
+        },
+        "coordinator": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    }
+  }
+}

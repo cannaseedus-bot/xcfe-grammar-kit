@@ -1,0 +1,45 @@
+{
+  "@no-eval": true,
+  "id": "ELIZA-1",
+  "description": "ELIZA-1: 16 reasoning operators — Pop detection, Sek emission (vertical split)",
+  "phase": "Pop",
+  "confidence": 1.0,
+  "governs": ["because", "therefore", "but", "however", "requires", "depends",
+              "shows", "proves", "first", "then", "is", "are", "conflict",
+              "or", "always", "never", "test", "related", "replace", "verify", "go"],
+  "capabilities": [
+    "CAUSE", "CONTRAST", "DEPENDENCY", "CONSTRAINT", "EVIDENCE",
+    "SEQUENCE", "BOUNDARY", "STATE", "CONFLICT", "ALTERNATIVE",
+    "INVARIANT", "TEST", "RELATION", "SUBSTITUTE", "VERIFY", "DIRECT"
+  ],
+  "operator_pairs": [
+    {"name": "CAUSE",       "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "CONTRAST",    "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "DEPENDENCY",  "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "CONSTRAINT",  "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "EVIDENCE",    "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "SEQUENCE",    "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "BOUNDARY",    "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "STATE",       "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "CONFLICT",    "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "ALTERNATIVE", "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "INVARIANT",   "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "TEST",        "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "RELATION",    "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "SUBSTITUTE",  "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "VERIFY",      "detect_phase": "Pop", "emit_phase": "Sek"},
+    {"name": "DIRECT",      "detect_phase": "Pop", "emit_phase": "Sek"}
+  ],
+  "folds": [
+    {"phase": "Pop", "op": "detect_operator"},
+    {"phase": "Sek", "op": "emit_directive", "scope": "local"}
+  ],
+  "null_fallback": "intent-unresolved",
+  "sandbox": {
+    "gram_ns":         "ELIZA-1",
+    "manifest_access": ["words", "kuhul"],
+    "effects":         ["gramRead"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

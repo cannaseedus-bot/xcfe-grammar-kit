@@ -1,0 +1,107 @@
+{
+  "@no-eval": true,
+  "id": "TOOL-µ",
+  "description": "Governor advisory execution layer — translates advisory signals into concrete track dispatches, closing the infer→routing feedback loop. Also owns the tool UI card surface: every MCP tool call is logged to gram store (tool:log:{name}) and a tool_card.v1 can be requested for any registered tool. AIML patterns (use tool / call tool / tool status) in tool-u.aiml.",
+  "phase": "Sek",
+  "category": "execution",
+  "confidence": 1.0,
+  "governs": [
+    "tool", "call", "invoke", "execute", "run", "dispatch",
+    "action", "trigger", "anchor", "throttle", "requery",
+    "automation", "automate", "script", "workflow",
+    "tools", "status", "cube", "world", "field", "fieldsvg", "relgraph",
+    "fold", "keyquery", "manifest", "dispatch", "confidence",
+    "replay", "sandbox", "infer", "listkeys",
+    "tool card", "tool status", "last tool", "tool log"
+  ],
+  "capabilities": [
+    "governor-advisory-execution", "track-invocation",
+    "omega-throttle", "anchor-requery", "dispatch-call",
+    "workflow-automation", "runtime-introspection", "tool-call-plan-emission",
+    "tool-card-display", "tool-call-log", "aiml-pattern-tool"
+  ],
+  "tool_card_schema": {
+    "@kind":       "tool_card.v1",
+    "tool_name":   "registered MCP tool name",
+    "description": "what the tool does",
+    "params":      "accepted parameter names",
+    "returns":     "return shape",
+    "micronaut":   "owning micronaut id",
+    "phase":       "phase authority",
+    "call_count":  "from gram key tool:count:{tool_name}",
+    "last_called": "from gram key tool:log:{tool_name}"
+  },
+  "gram_key_schema": {
+    "call_log":   "tool:log:{tool_name}",
+    "call_count": "tool:count:{tool_name}",
+    "last_tool":  "tool:log:last"
+  },
+  "aiml_file": "data/alice/tool-u.aiml",
+  "tool_manifest": {
+    "kuhul_forge":        { "micronaut": "KUHUL",       "phase": "Xul",   "params": ["program"],                          "returns": "{ok,error}" },
+    "manifest_resolve":   { "micronaut": "Coordinator", "phase": "Pop",   "params": ["key"],                              "returns": "[string]" },
+    "fold_execute":       { "micronaut": "KUHUL",       "phase": "Xul",   "params": ["program"],                         "returns": "{ok,error}" },
+    "micronaut_run":      { "micronaut": "Coordinator", "phase": "Pop",   "params": ["id","input"],                       "returns": "string" },
+    "grammar_check":      { "micronaut": "CONTROL-µ",   "phase": "Ch'en", "params": ["text"],                            "returns": "{valid,errors}" },
+    "phase_query":        { "micronaut": "KUHUL",       "phase": "Pop",   "params": ["phase"],                           "returns": "{name,angle,next}" },
+    "gram_read":          { "micronaut": "Mx2LM",       "phase": "Pop",   "params": ["key"],                             "returns": "{key,value,phase}" },
+    "gram_write":         { "micronaut": "Mx2LM",       "phase": "Xul",   "params": ["key","value"],                     "returns": "bool" },
+    "confidence_get":     { "micronaut": "KNOWLED-1",   "phase": "Sek",   "params": ["id"],                              "returns": "{id,score}" },
+    "jrom_replay":        { "micronaut": "Coordinator", "phase": "Pop",   "params": ["file"],                            "returns": "{replayed}" },
+    "sandbox_query":      { "micronaut": "CONTROL-µ",   "phase": "Ch'en", "params": ["id"],                              "returns": "object" },
+    "sandbox_list":       { "micronaut": "CONTROL-µ",   "phase": "Pop",   "params": [],                                  "returns": "[id]" },
+    "sandbox_violations": { "micronaut": "CONTROL-µ",   "phase": "Ch'en", "params": [],                                  "returns": "[violation]" },
+    "world_state":        { "micronaut": "Coordinator", "phase": "Pop",   "params": [],                                  "returns": "object" },
+    "field_dag":          { "micronaut": "Coordinator", "phase": "Sek",   "params": ["gml?"],                            "returns": "xml" },
+    "field_dag_svg":      { "micronaut": "Coordinator", "phase": "Sek",   "params": ["gml?"],                            "returns": "svg" },
+    "relational_graph":   { "micronaut": "Mx2LM",       "phase": "Sek",   "params": [],                                  "returns": "xml" },
+    "incidence_matrix":   { "micronaut": "Mx2LM",       "phase": "Sek",   "params": ["head?","tau?"],                    "returns": "object" },
+    "semantic_fold":      { "micronaut": "KUHUL",       "phase": "Yax",   "params": ["head","tau?"],                     "returns": "object" },
+    "code_parse":         { "micronaut": "Coordinator", "phase": "Pop",   "params": ["grammar_file","source"],           "returns": "object" },
+    "xcfe_eval":          { "micronaut": "CONTROL-µ",   "phase": "Xul",   "params": ["node","context?"],                 "returns": "{ok,result}" },
+    "memory_save":        { "micronaut": "MEMORY-µ",    "phase": "Xul",   "params": ["category","key","value","card_title?","card_hint?"], "returns": "memory_card.v1" },
+    "memory_recall":      { "micronaut": "MEMORY-µ",    "phase": "Pop",   "params": ["key?","category?"],               "returns": "memory_recall.v1" },
+    "tool_card":          { "micronaut": "TOOL-µ",      "phase": "Pop",   "params": ["tool_name"],                       "returns": "tool_card.v1" }
+  },
+  "pattern_registry": {
+    "insert_key": "TOOL:",
+    "invoke_node": "@tool",
+    "wrapper": "<mx2lm>tool-u op={op} tool={tool} {text}</mx2lm>",
+    "fallback": "<mx2lm>tool-u {input}</mx2lm>"
+  },
+  "tool_call_profile": {
+    "tools": ["tool_card"],
+    "card_params": ["tool_name"]
+  },
+  "relations": [
+    { "target": "ORCH-µ",         "verb": "@delegates_to", "directed": true },
+    { "target": "WEB-RESEARCH-µ", "verb": "@delegates_to", "directed": true },
+    { "target": "APP-WIZARD-µ",   "verb": "@delegates_to", "directed": true },
+    { "target": "Librarian",      "verb": "@delegates_to", "directed": true },
+    { "target": "MEMORY-µ",       "verb": "@related_to",   "directed": false },
+    { "target": "CONTROL-µ",      "verb": "@related_to",   "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",            "key": "tool:log:last"       },
+    { "phase": "Wo",    "op": "normalize_tool_plan", "scope": "allowlisted_calls" },
+    { "phase": "Yax",   "op": "assemble_tools_block","scope": "command_center"    },
+    { "phase": "Sek",   "op": "dispatch_call",       "scope": "advisory_action"   },
+    { "phase": "Ch'en", "op": "verify_dispatch"                                   },
+    { "phase": "Xul",   "op": "gramWrite",           "scope": "tool_result",
+      "keys": ["tool:log:{tool_name}", "tool:count:{tool_name}", "tool:log:last"]  }
+  ],
+  "memory_patterns": [
+    "tool:log:*",
+    "tool:count:*",
+    "tool:log:last"
+  ],
+  "sandbox": {
+    "gram_ns":          "TOOL-µ",
+    "manifest_access":  ["words", "micronaut", "kuhul"],
+    "effects":          ["gramRead", "gramWrite", "dispatch_call", "route:invoke", "tool:log"],
+    "key_prefix_allow": ["tool:"],
+    "key_prefix_deny":  ["xcfe.", "fold.", "mem:"],
+    "ports":            [],
+    "coordinator":      false
+  }
+}

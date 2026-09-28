@@ -1,0 +1,29 @@
+{
+  "@no-eval": true,
+  "id": "CREATE-µ",
+  "description": "Relational creative — generative composition and assembly; delegates to ORCH-µ, horizontal-fold with MEM-µ; Yax phase",
+  "phase": "Yax",
+  "category": "creative",
+  "confidence": 1.0,
+  "governs": ["create", "compose", "generate", "assemble", "build", "make", "design", "write",
+              "rewrite", "paraphrase", "translate", "brainstorm", "ideas", "email", "draft"],
+  "capabilities": ["generative-composition", "Yax-assembly", "pattern-weaving", "horizontal-fold",
+                   "rewrite-editor", "translation-transform", "idea-variant-generator", "email-drafting"],
+  "relations": [
+    { "target": "ORCH-µ", "verb": "@delegates_to", "directed": true  },
+    { "target": "MEM-µ",  "verb": "@related_to",   "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop", "op": "gramRead",         "key": "create_spec" },
+    { "phase": "Wo",  "op": "load_patterns"                          },
+    { "phase": "Yax", "op": "compose_output"                         },
+    { "phase": "Xul", "op": "gramWrite",        "scope": "local"     }
+  ],
+  "sandbox": {
+    "gram_ns":         "CREATE-µ",
+    "manifest_access": ["words", "kuhul", "css", "micronaut"],
+    "effects":         ["gramRead", "gramWrite", "route:delegate"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

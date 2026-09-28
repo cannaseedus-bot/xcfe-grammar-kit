@@ -1,0 +1,68 @@
+{
+  "@no-eval": true,
+  "id": "Coordinator",
+  "description": "Multi-micronaut routing and planning — Ch'en dominant; inherits from eliza + coder; O(1) @roster capability-map lookup; parallel Sek dispatch = horizontal fold across sub-micronauts",
+  "phase": "Ch'en",
+  "confidence": 1.0,
+  "lineage": ["micronaut-core", "eliza", "coder"],
+  "governs": ["coordinate", "route", "orchestrate", "delegate", "manage", "plan",
+              "dispatch", "decompose", "aggregate", "task", "intent", "code", "mx2lm", "ngram",
+              "blog", "post", "publish", "comment", "@blog",
+              "app", "template", "blueprint", "@app",
+              "image", "royalty-free", "license", "attribution", "media",
+              "search", "research", "citation", "sources", "no fact found", "fact miss",
+              "summarize", "summary", "explain", "rewrite", "translate", "brainstorm",
+              "ideas", "roadmap", "milestones", "debug", "email", "meeting"],
+  "capabilities": [
+    "intent-matching", "pattern-response", "synonym-collapse",
+    "code-generation", "tool-calls",
+    "routing", "planning", "task-decomposition",
+    "result-aggregation", "micronaut-spawn",
+    "⟁Pop", "⟁Wo", "⟁Sek", "⟁Ch'en"
+  ],
+  "delivers": [
+    { "type": "fold_result",    "schema": "fold:v2",     "phase": "Ch'en" },
+    { "type": "xcfe_program",   "schema": "xcfe:v2",     "phase": "Sek"   },
+    { "type": "manifest_entry", "schema": "manifest:v1", "phase": "Wo"    }
+  ],
+  "roster": {
+    "eliza":        ["intent-matching", "pattern-response", "⟁Pop", "⟁Xul"],
+    "coder":        ["code-generation", "tool-calls", "⟁Wo", "⟁Sek"],
+    "reasoner":     ["logical-deduction", "chain-of-thought", "⟁Yax", "⟁Sek"],
+    "memory-agent": ["gram-read", "gram-write", "gram-checkpoint", "⟁Pop", "⟁Xul"],
+    "mx2lm":        ["ngram-index", "pattern-insertion", "@mx2lm", "⟁Sek", "⟁Ch'en"],
+    "blog":         ["app-blueprint", "post-composition", "publish-gates", "@blog", "⟁Yax", "⟁Ch'en"],
+    "app-wizard":   ["type-selection", "catalog-routing", "watchable-build", "semantic-slot-routing", "@app", "⟁Wo", "⟁Yax"],
+    "web-research": ["query-variants", "citation-tracking", "source-verification", "@search", "@research", "⟁Yax", "⟁Ch'en"],
+    "librarian":    ["royalty-free-media-search", "license-filtering", "attribution-check", "⟁Yax", "⟁Ch'en"],
+    "reasoning":    ["summarization", "explanation", "meeting-notes", "@summarize", "@explain", "@meeting", "⟁Yax", "⟁Sek"],
+    "writing":      ["rewrite", "translation", "brainstorm", "email-draft", "@rewrite", "@translate", "@brainstorm", "@email", "⟁Yax"],
+    "coding":       ["implementation", "debugging", "patch-verification", "@code", "@debug", "⟁Sek", "⟁Ch'en"],
+    "planning":     ["roadmap", "milestones", "task-breakdown", "@plan", "⟁Wo", "⟁Ch'en"]
+  },
+  "routing_policy": {
+    "strategy":              "capability-match",
+    "fallback":              "eliza",
+    "load_balance":          true,
+    "max_parallel_delegates": 4
+  },
+  "sub_micronauts": ["ELIZA", "ELIZA-1", "Factory", "Librarian", "WEB-RESEARCH-µ", "KNOWLED-1",
+                     "coder", "reasoner", "memory-agent", "Mx2LM", "BLOG-µ", "APP-WIZARD-µ"],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",           "key": "coordinator_request"              },
+    { "phase": "Pop",   "op": "intent_match",       "delegate": "eliza"                       },
+    { "phase": "Wo",    "op": "decompose_task"                                                 },
+    { "phase": "Wo",    "op": "emit_manifest_entry"                                            },
+    { "phase": "Sek",   "op": "dispatch_parallel",  "note": "horizontal fold, Δθ=0 per route" },
+    { "phase": "Ch'en", "op": "aggregate_results"                                              },
+    { "phase": "Ch'en", "op": "verify_delegation"                                              },
+    { "phase": "Xul",   "op": "gramWrite",          "scope": "request"                        }
+  ],
+  "sandbox": {
+    "gram_ns":         "Coordinator",
+    "manifest_access": ["words", "micronaut", "kuhul", "css"],
+    "effects":         ["gramRead", "gramWrite", "route:delegate", "manifest_entry:emit"],
+    "ports":           [9000, 8764, 17480],
+    "coordinator":     true
+  }
+}

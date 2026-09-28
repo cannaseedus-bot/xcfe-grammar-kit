@@ -1,0 +1,55 @@
+{
+  "@no-eval": true,
+  "id": "TEMPLATE-µ",
+  "description": "Template micronaut. Routes scaffold requests to pre-built kit skeletons, fills {{slot}} placeholders with user-provided context via LFM, and emits complete project file trees. Owns the binding between design kit structure and runtime context.",
+  "phase": "Yax",
+  "category": "scaffold",
+  "confidence": 0.82,
+  "governs": [
+    "template_scaffold",
+    "template_fill",
+    "template_brand",
+    "kit_select",
+    "vite",
+    "react",
+    "scaffold",
+    "design_kit",
+    "branding",
+    "placeholder"
+  ],
+  "capabilities": [
+    "select_kit_by_domain",
+    "fill_slots_from_context",
+    "expand_lfm_markers",
+    "emit_project_files",
+    "register_template_kit",
+    "recall_brand_context"
+  ],
+  "pattern_registry": {
+    "insert_key":  "TEMPLATE:scaffold",
+    "invoke_node": "template_mu",
+    "wrapper":     "kit_fill_wrapper",
+    "fallback":    "lfm_free_scaffold"
+  },
+  "relations": [
+    { "target": "MEMORY-µ",  "verb": "@reads",        "directed": true },
+    { "target": "CONTROL-µ", "verb": "@delegates_to", "directed": true },
+    { "target": "CHAT-µ",    "verb": "@uses",         "directed": true }
+  ],
+  "folds": [
+    {
+      "phase": "Yax",
+      "op": "bind_template_context",
+      "fold_weight": 0.75,
+      "relation_weight": 0.80,
+      "phase_weight": 0.60,
+      "note": "associative phase — binds template pattern to user context"
+    }
+  ],
+  "kit_registry": "data/templates/",
+  "slot_syntax": "{{slot_name}}",
+  "lfm_marker_syntax": "{{lfm:expand — instruction}}",
+  "slot_fill_order": [
+    "app_name", "brand_color", "brand_dark", "description", "rpc_port", "features"
+  ]
+}

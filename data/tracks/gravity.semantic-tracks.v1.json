@@ -1,0 +1,23 @@
+{
+  "@no-eval": true,
+  "id": "gravity",
+  "description": "Gravity well routing — score = established_nodes / distance²",
+  "phase": "Pop",
+  "confidence": 1.0,
+  "governs": ["routing", "score", "gravity", "dispatch", "weight", "distance"],
+  "capabilities": ["gravity-well-scoring", "micronaut-selection", "factory-fallback"],
+  "folds": [
+    {"phase": "Pop", "op": "gramRead", "key": "routing_state"},
+    {"phase": "Wo",  "op": "score_all_micronauts"},
+    {"phase": "Yax", "op": "select_best", "threshold": 0.1},
+    {"phase": "Xul", "op": "gramWrite",   "key": "routing_result", "scope": "local"}
+  ],
+  "memory_patterns": ["gravity_score", "routing_bias", "dispatch_history"],
+  "sandbox": {
+    "gram_ns":         "gravity",
+    "manifest_access": ["micronaut"],
+    "effects":         ["gramRead", "gramWrite"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

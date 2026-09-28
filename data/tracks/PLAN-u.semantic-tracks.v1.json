@@ -1,0 +1,40 @@
+{
+  "@no-eval": true,
+  "id": "PLAN-µ",
+  "description": "Bounded task decomposition and task-list projection.",
+  "phase": "Wo",
+  "category": "planning",
+  "confidence": 1.0,
+  "governs": ["plan", "roadmap", "task", "tasks", "milestone", "milestones", "decompose", "dependencies", "next"],
+  "capabilities": ["goal_normalization", "task_decomposition", "dependency_ordering", "task_list_projection", "wpf_card"],
+  "active_verbs": ["refine", "edit", "verify", "accept", "execute", "pause"],
+  "relations": [
+    {"target": "Coordinator", "verb": "@delegates_to", "directed": true},
+    {"target": "ADVISOR-µ", "verb": "@related_to", "directed": false},
+    {"target": "MEMORY-µ", "verb": "@supports", "directed": false}
+  ],
+  "folds": [
+    {"phase": "Pop", "op": "gramRead", "key": "plan_request"},
+    {"phase": "Pop", "op": "unfold_ngram_context", "track": "MEMORY-µ", "gate": "request_ngrams_present"},
+    {"phase": "Wo", "op": "decompose_task", "gate": "declared_goal"},
+    {"phase": "Yax", "op": "order_dependencies", "gate": "task_list_present"},
+    {"phase": "Yax", "op": "fold_ngram_evidence", "scope": "plan_context"},
+    {"phase": "Sek", "op": "emit_plan", "gate": "authority == none"},
+    {"phase": "Ch'en", "op": "verify_plan", "gate": "all_tasks_have_ids"},
+    {"phase": "Xul", "op": "gramWrite", "scope": "plan_candidate"}
+  ],
+  "ui": {
+    "card": "⟁WIDGETCARD",
+    "label": "Plan",
+    "fields": ["goal", "tasks", "dependencies", "owner", "phase", "status", "next"],
+    "tasks_field": "tasks",
+    "activation_key": "track"
+  },
+  "sandbox": {
+    "gram_ns": "PLAN-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": ["gramRead", "plan:emit", "card:project"],
+    "ports": [],
+    "coordinator": false
+  }
+}

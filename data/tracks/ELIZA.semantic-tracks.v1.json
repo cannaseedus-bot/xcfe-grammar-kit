@@ -1,0 +1,41 @@
+{
+  "@no-eval": true,
+  "id": "ELIZA",
+  "description": "Intent matching and pattern response — Pop perceive, Xul emit, XCFE gate, synonym collapse; no vertical phase transition",
+  "phase": "Pop",
+  "confidence": 1.0,
+  "governs": ["pattern", "response", "intent", "greeting", "salutation", "question", "answer",
+              "chat", "synonym", "match", "wildcard"],
+  "capabilities": [
+    "intent-matching", "pattern-response", "synonym-collapse",
+    "eliza-rule-eval", "xcfe-condition-check", "AIML-1.0",
+    "⟁Pop", "⟁Xul"
+  ],
+  "cognitive_state": {
+    "temperature": { "current": 0.4, "min": 0.0, "max": 1.2, "adaptive": true },
+    "response_flare": { "enthusiasm": 0.4, "certainty": 0.7, "verbosity": 0.4, "empathy": 0.7 }
+  },
+  "pattern_registry": {
+    "rules":    [],
+    "synonyms": {},
+    "fallback": "I'm not sure I understand. Could you say more about that?"
+  },
+  "folds": [
+    { "phase": "Pop", "op": "gramRead",              "key": "last_input"    },
+    { "phase": "Pop", "op": "synonym_collapse"                               },
+    { "phase": "Pop", "op": "manifest_lookup"                                },
+    { "phase": "Pop", "op": "find_best_pattern_match"                        },
+    { "phase": "Pop", "op": "xcfe_condition_check"                           },
+    { "phase": "Xul", "op": "template_fill"                                  },
+    { "phase": "Xul", "op": "gramWrite",             "scope": "local"       }
+  ],
+  "memory_patterns": ["last_input", "that_context", "topic", "session_vars"],
+  "null_fallback": "intent-unresolved",
+  "sandbox": {
+    "gram_ns":         "ELIZA",
+    "manifest_access": ["words", "kuhul"],
+    "effects":         ["gramRead", "gramWrite"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

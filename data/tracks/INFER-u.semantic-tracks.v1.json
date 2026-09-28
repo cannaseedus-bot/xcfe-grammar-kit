@@ -1,0 +1,68 @@
+{
+  "@no-eval": true,
+  "id": "INFER-µ",
+  "description": "Relational inference — evidence accumulation and evaluation; @eval REASON-µ results, @aggregate to ORCH-µ; Ch'en phase",
+  "phase": "Ch'en",
+  "category": "cognitive",
+  "confidence": 1.0,
+  "governs": [
+    "evaluate", "evidence", "judge", "accumulate", "conclude", "verify", "weigh", "assess",
+    "qa", "question answering", "truth-conditional", "fact", "definition", "why", "how"
+  ],
+  "capabilities": [
+    "evidence-accumulation", "Ch'en-evaluation", "provenance-tracking", "confidence-scoring",
+    "truth-conditional-check", "qa-answer-verification"
+  ],
+  "qa_profile": {
+    "modes": ["closed_domain", "open_domain"],
+    "approaches": ["rule_based", "knowledge_graph", "hybrid"],
+    "answer_types": ["fact", "definition", "how", "why", "hypothetical"],
+    "truth_model": "truth_conditional",
+    "ontology_required": true
+  },
+  "truth_semantics": [
+    {
+      "proposition": "inference_result_r",
+      "truth_when": "r satisfies correspondence constraints under accepted evidence and rules",
+      "false_when": "r violates evidence consistency or rule constraints",
+      "evidence_required": true
+    }
+  ],
+  "has_a_hierarchy": [
+    {
+      "owner": "inference_engine",
+      "member": "evidence_set",
+      "relation": "has_a",
+      "ownership": "owned",
+      "cardinality": "1:n",
+      "rule": "inference depends on bounded evidence members per query"
+    },
+    {
+      "owner": "inference_engine",
+      "member": "rule_base",
+      "relation": "contains",
+      "ownership": "shared",
+      "cardinality": "1:n",
+      "rule": "truth-conditional checks apply over rule propositions"
+    }
+  ],
+  "relations": [
+    { "target": "REASON-µ", "verb": "@governs",      "directed": true },
+    { "target": "ORCH-µ",   "verb": "@produces", "directed": true }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",           "key": "infer_evidence"                     },
+    { "phase": "Sek",   "op": "score_evidence"                                                   },
+    { "phase": "Ch'en", "op": "accumulate_verdict"                                               },
+    { "phase": "Ch'en", "op": "check_provenance_weights"                                         },
+    { "phase": "Xul",   "op": "gramWrite",          "scope": "local", "gate": "confidence:0.5"  }
+  ],
+  "invariant": "provenance_weight(VALIDATOR)=1.0 > provenance_weight(LLM)=0.5",
+  "sandbox": {
+    "gram_ns":         "INFER-µ",
+    "manifest_access": ["words", "kuhul"],
+    "effects":         ["gramRead", "gramWrite", "confidence:read", "confidence:write"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

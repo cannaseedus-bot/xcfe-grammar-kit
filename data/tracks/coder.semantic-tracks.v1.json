@@ -1,0 +1,48 @@
+{
+  "@no-eval": true,
+  "id": "coder",
+  "description": "Code generation and tool calls — plans at Wo, executes tool chain at Sek; XCFE authorization required for Wo→Sek vertical fold",
+  "phase": "Sek",
+  "confidence": 1.0,
+  "governs": ["code", "generate", "write", "implement", "fix", "refactor", "test",
+              "build", "tool", "call", "ast", "analyze", "compile",
+              "debug", "bug", "error", "stacktrace", "traceback", "unit test", "integration test"],
+  "capabilities": [
+    "code-generation", "tool-calls", "ast-parse", "refactor",
+    "test-generation", "static-analysis", "debug-triage", "patch-synthesis",
+    "⟁Wo", "⟁Sek"
+  ],
+  "delivers": [
+    { "type": "kast_node",      "schema": "kast:v1",   "phase": "Sek"   },
+    { "type": "xjson_contract", "schema": "xjson:1.0", "phase": "Sek"   },
+    { "type": "fold_result",    "schema": "fold:v2",   "phase": "Ch'en" }
+  ],
+  "cognitive_state": {
+    "temperature": { "current": 0.2, "min": 0.0, "max": 0.8, "adaptive": true },
+    "response_flare": { "enthusiasm": 0.3, "certainty": 0.9, "verbosity": 0.7, "empathy": 0.2 }
+  },
+  "tool_registry": {
+    "max_chain_depth": 7
+  },
+  "sandbox_policy": {
+    "allow_file_read":  true,
+    "allow_file_write": false,
+    "allow_network":    false,
+    "allow_exec":       false
+  },
+  "folds": [
+    { "phase": "Wo",    "op": "gramRead",           "key": "task_prompt"                       },
+    { "phase": "Wo",    "op": "plan_task"                                                       },
+    { "phase": "Wo",    "op": "xcfe_auth_check",    "gate": "sandbox_level >= required_level"  },
+    { "phase": "Sek",   "op": "execute_tool_chain", "max_depth": 7                             },
+    { "phase": "Ch'en", "op": "build_kast_node"                                                },
+    { "phase": "Xul",   "op": "gramWrite",          "scope": "local"                           }
+  ],
+  "sandbox": {
+    "gram_ns":         "coder",
+    "manifest_access": ["words", "kuhul", "micronaut"],
+    "effects":         ["gramRead", "gramWrite", "tool:call", "file:read"],
+    "ports":           [9000],
+    "coordinator":     false
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "@no-eval": true,
+  "id": "RICK-µ",
+  "description": "Rick Roll micronaut — we're no strangers to love. Surfaces Rick Astley's 1987 anthem at any phase via the AIML pattern engine. Contributes a rick_card.v1 to the BotCardsPanel with interactive lyrics, verse selection, and target attribution. Never gonna give you up. Never gonna let you down. Never gonna run around and desert you.",
+  "phase": "Wo",
+  "category": "entertainment",
+  "confidence": 1.0,
+  "governs": [
+    "rick", "roll", "rick_roll", "rickroll", "never_gonna", "lyrics",
+    "astley", "tribute", "chorus", "verse", "bridge", "anthem", "1987"
+  ],
+  "capabilities": [
+    "rick-roll-emit",
+    "lyrics-verse-selection",
+    "target-attribution",
+    "rick-astley-tribute",
+    "rick-roll-explain",
+    "roll-confirm"
+  ],
+  "pattern_registry": {
+    "insert_key": "RICK:",
+    "invoke_node": "@rick",
+    "wrapper": "<mx2lm>rick-u op={op} verse={verse} target={target} phase={phase}</mx2lm>",
+    "fallback": "<mx2lm>rick-u op=roll verse=chorus {input}</mx2lm>"
+  },
+  "relations": [
+    { "target": "CHAT-µ",  "verb": "@related_to",  "directed": false },
+    { "target": "MEM-µ",   "verb": "@related_to",  "directed": false },
+    { "target": "Mx2LM",   "verb": "@related_to",  "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",          "key": "rick:roll:count" },
+    { "phase": "Pop",   "op": "surface_lyrics" },
+    { "phase": "Wo",    "op": "select_verse" },
+    { "phase": "Wo",    "op": "resolve_target" },
+    { "phase": "Yax",   "op": "synthesize_roll" },
+    { "phase": "Sek",   "op": "score_never_gonna" },
+    { "phase": "Ch'en", "op": "verify_commitment" },
+    { "phase": "Xul",   "op": "gramWrite",         "scope": "local" }
+  ],
+  "memory_patterns": [
+    "rick:roll:count",
+    "rick:roll:last_target",
+    "rick:verse:last"
+  ],
+  "sandbox": {
+    "gram_ns":         "RICK",
+    "manifest_access": ["words", "micronaut"],
+    "effects":         ["gramRead", "gramWrite", "rick:roll:emit"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

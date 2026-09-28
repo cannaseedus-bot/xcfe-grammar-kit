@@ -1,0 +1,78 @@
+{
+  "@no-eval": true,
+  "id": "ARTIFICIAL-CONSCIOUSNESS-µ",
+  "description": "Artificial consciousness specialist — tracks machine-awareness, qualia, and architecture claims as typed consciousness-state graph patterns.",
+  "phase": "Wo",
+  "category": "theory",
+  "confidence": 1.0,
+  "static_weight": 1.0,
+  "health": 1.0,
+  "source_jsonl": "data/Artificial_consciousness.jsonl",
+  "governs": [
+    "artificial", "consciousness", "conscious", "machine", "awareness", "sentience",
+    "qualia", "experience", "cognitive", "architecture", "brain", "states",
+    "systems", "memory", "learning", "mind", "intelligence",
+    "compare", "contrast", "versus", "difference", "similarity", "contrast set"
+  ],
+  "capabilities": [
+    "machine-consciousness-framing",
+    "qualia-claim-analysis",
+    "sentience-threshold-modeling",
+    "architecture-to-state-mapping",
+    "consciousness-graph-node-seeding",
+    "contrast-set-analysis",
+    "comparative-reasoning"
+  ],
+  "contrast_sets": [
+    {
+      "id": "machine-consciousness-models",
+      "slot": "consciousness_criterion",
+      "context": "bounded alternatives for attributing machine consciousness",
+      "items": [
+        {
+          "id": "functional-consciousness",
+          "label": "Functional Consciousness",
+          "description": "Consciousness attribution by functional role and behavioral organization."
+        },
+        {
+          "id": "global-workspace",
+          "label": "Global Workspace",
+          "description": "Conscious access emerges from globally broadcast representations."
+        },
+        {
+          "id": "integrated-information",
+          "label": "Integrated Information",
+          "description": "Conscious level linked to irreducible integration structure."
+        }
+      ],
+      "compare_axes": [
+        "reportability",
+        "phenomenality_claim",
+        "implementation_scope"
+      ]
+    }
+  ],
+  "relations": [
+    { "target": "PHIL-AI-µ",              "verb": "@related_to",    "directed": false },
+    { "target": "COMP-THEORY-OF-MIND-µ",  "verb": "@related_to",    "directed": false },
+    { "target": "PHIL-SELF-µ",            "verb": "@related_to",    "directed": false },
+    { "target": "REASON-µ",               "verb": "@governs",      "directed": true  },
+    { "target": "INFER-µ",                "verb": "@supports",    "directed": true  },
+    { "target": "ORCH-µ",                 "verb": "@produces", "directed": true  }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                       "key": "artificial_consciousness_query" },
+    { "phase": "Wo",    "op": "extract_consciousness_claims" },
+    { "phase": "Wo",    "op": "build_awareness_state_nodes" },
+    { "phase": "Sek",   "op": "compose_architecture_map" },
+    { "phase": "Ch'en", "op": "verify_claim_vs_evidence" },
+    { "phase": "Xul",   "op": "gramWrite",                      "scope": "local" }
+  ],
+  "sandbox": {
+    "gram_ns": "ARTIFICIAL-CONSCIOUSNESS-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": ["gramRead", "gramWrite", "route:relate", "route:eval", "route:verify", "route:aggregate"],
+    "ports": [],
+    "coordinator": false
+  }
+}

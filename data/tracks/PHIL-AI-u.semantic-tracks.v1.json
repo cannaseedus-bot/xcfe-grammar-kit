@@ -1,0 +1,82 @@
+{
+  "@no-eval": true,
+  "id": "PHIL-AI-µ",
+  "description": "Philosophy-of-AI specialist — frames consciousness, intentionality, and machine-intelligence debates into evaluable argument graphs.",
+  "phase": "Wo",
+  "category": "theory",
+  "confidence": 1.0,
+  "static_weight": 1.0,
+  "health": 1.0,
+  "source_jsonl": "data/Philosophy_of_artificial_intelligence.jsonl",
+  "governs": [
+    "philosophy", "artificial", "intelligence", "machine", "machines", "mind",
+    "consciousness", "turing", "chinese", "room", "symbol", "intentionality",
+    "program", "computer", "strong-ai", "weak-ai", "cognition", "qualia",
+    "compare", "contrast", "versus", "difference", "similarity", "contrast set"
+  ],
+  "capabilities": [
+    "ai-philosophy-framing",
+    "argument-graph-construction",
+    "chinese-room-analysis",
+    "turing-test-positioning",
+    "machine-consciousness-criteria",
+    "contrast-set-analysis",
+    "comparative-reasoning"
+  ],
+  "contrast_sets": [
+    {
+      "id": "ai-mind-positions",
+      "slot": "machine_mind_position",
+      "context": "bounded alternatives used in philosophy-of-AI debates",
+      "items": [
+        {
+          "id": "strong-ai",
+          "label": "Strong AI",
+          "description": "Appropriate computation can constitute genuine understanding."
+        },
+        {
+          "id": "weak-ai",
+          "label": "Weak AI",
+          "description": "AI simulates intelligence without constituting mindedness."
+        },
+        {
+          "id": "chinese-room-critique",
+          "label": "Chinese Room Critique",
+          "description": "Syntax alone is insufficient for semantics and understanding."
+        },
+        {
+          "id": "functionalist-defense",
+          "label": "Functionalist Defense",
+          "description": "Mental status depends on functional role, not substrate."
+        }
+      ],
+      "compare_axes": [
+        "semantic_understanding",
+        "intentionality",
+        "testability"
+      ]
+    }
+  ],
+  "relations": [
+    { "target": "ARTIFICIAL-CONSCIOUSNESS-µ", "verb": "@related_to",    "directed": false },
+    { "target": "Librarian",                  "verb": "@delegates_to",  "directed": true  },
+    { "target": "REASON-µ",                   "verb": "@governs",      "directed": true  },
+    { "target": "INFER-µ",                    "verb": "@supports",    "directed": true  },
+    { "target": "ORCH-µ",                     "verb": "@produces", "directed": true  }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                 "key": "phil_ai_query" },
+    { "phase": "Wo",    "op": "extract_positions" },
+    { "phase": "Wo",    "op": "map_argument_edges" },
+    { "phase": "Sek",   "op": "compose_position_summary" },
+    { "phase": "Ch'en", "op": "verify_claim_provenance" },
+    { "phase": "Xul",   "op": "gramWrite",                "scope": "local" }
+  ],
+  "sandbox": {
+    "gram_ns": "PHIL-AI-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": ["gramRead", "gramWrite", "route:delegate", "route:eval", "route:verify", "route:aggregate"],
+    "ports": [],
+    "coordinator": false
+  }
+}

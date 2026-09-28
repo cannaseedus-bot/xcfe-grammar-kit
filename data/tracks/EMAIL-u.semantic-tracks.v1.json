@@ -1,0 +1,60 @@
+{
+  "@no-eval": true,
+  "id": "EMAIL-µ",
+  "description": "Email communication micronaut — compose, send, read, reply, search, and delete email. Compose/reply ops run at Wo (context formation); send/delete commit at Xul; inbox/read surface at Pop; search at Sek. The compose UI card is an interactive form pre-filled from AIML params. Actual dispatch delegates to the MCP email tool via Coordinator.",
+  "phase": "Wo",
+  "category": "communication",
+  "confidence": 1.0,
+  "governs": [
+    "email", "compose", "send", "inbox", "read", "reply", "forward",
+    "search", "delete", "subject", "recipient", "message", "draft",
+    "to", "from", "cc", "body"
+  ],
+  "capabilities": [
+    "email-compose",
+    "email-send",
+    "email-inbox-list",
+    "email-read",
+    "email-reply",
+    "email-forward",
+    "email-search",
+    "email-delete",
+    "recipient-address-resolve",
+    "compose-form-card"
+  ],
+  "pattern_registry": {
+    "insert_key": "EMAIL:",
+    "invoke_node": "@email",
+    "wrapper": "<mx2lm>email-u op={op} to={to} subject={subject} body={body} phase={phase}</mx2lm>",
+    "fallback": "<mx2lm>email-u {input}</mx2lm>"
+  },
+  "relations": [
+    { "target": "Coordinator",  "verb": "@delegates_to",  "directed": true },
+    { "target": "MEM-µ",        "verb": "@related_to",    "directed": false },
+    { "target": "CHAT-µ",       "verb": "@related_to",    "directed": false },
+    { "target": "Mx2LM",        "verb": "@related_to",    "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                   "key": "email:inbox:last" },
+    { "phase": "Pop",   "op": "inbox_surface" },
+    { "phase": "Wo",    "op": "classify_intent" },
+    { "phase": "Wo",    "op": "resolve_recipient" },
+    { "phase": "Yax",   "op": "compose_draft_tokens" },
+    { "phase": "Sek",   "op": "search_index" },
+    { "phase": "Ch'en", "op": "verify_recipient_body" },
+    { "phase": "Xul",   "op": "gramWrite",                  "scope": "local" }
+  ],
+  "memory_patterns": [
+    "email:inbox:last",
+    "email:sent:last",
+    "email:draft:current",
+    "email:contact:resolved"
+  ],
+  "sandbox": {
+    "gram_ns":         "EMAIL",
+    "manifest_access": ["words", "micronaut"],
+    "effects":         ["gramRead", "gramWrite", "email:send", "email:read", "email:search", "mcp:gmail"],
+    "ports":           [],
+    "coordinator":     true
+  }
+}

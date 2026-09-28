@@ -1,0 +1,23 @@
+{
+  "@no-eval": true,
+  "id": "intent-unresolved",
+  "description": "Pop null fallback — routes to Factory when gravity is too low to match",
+  "phase": "Pop",
+  "confidence": 1.0,
+  "governs": [],
+  "capabilities": ["factory-fallback", "low-gravity-route", "create-new-micronaut"],
+  "folds": [
+    {"phase": "Pop", "op": "gramRead",  "key": "last_unresolved_intent"},
+    {"phase": "Wo",  "op": "factory_create_candidate"},
+    {"phase": "Xul", "op": "gramWrite",  "scope": "local", "key": "intent_resolution_result"}
+  ],
+  "trigger_condition": "gravity_score < 0.1",
+  "action": "route_to_factory",
+  "sandbox": {
+    "gram_ns":         "intent-unresolved",
+    "manifest_access": ["micronaut", "kuhul"],
+    "effects":         ["gramRead", "gramWrite"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

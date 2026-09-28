@@ -1,0 +1,76 @@
+{
+  "@no-eval": true,
+  "id": "THOUGHT-OUTLINE-µ",
+  "description": "Thought-process outline specialist — turns cognition and reasoning discourse into graph-ready node taxonomies and pathway templates.",
+  "phase": "Wo",
+  "category": "theory",
+  "confidence": 1.0,
+  "static_weight": 1.0,
+  "health": 1.0,
+  "source_jsonl": "data/Outline_of_thought.jsonl",
+  "governs": [
+    "thought", "thinking", "reasoning", "cognitive", "cognition", "process",
+    "problem", "network", "theory", "mind", "intelligence", "outline",
+    "mental", "abstraction", "concept", "graph", "node", "pattern",
+    "compare", "contrast", "versus", "difference", "similarity", "contrast set"
+  ],
+  "capabilities": [
+    "thought-taxonomy-construction",
+    "reasoning-graph-node-patterns",
+    "concept-hierarchy-layout",
+    "workflow-outline-synthesis",
+    "mx2lm-node-seeding",
+    "contrast-set-analysis",
+    "comparative-reasoning"
+  ],
+  "contrast_sets": [
+    {
+      "id": "thought-structure-models",
+      "slot": "thought_organization_scheme",
+      "context": "bounded alternatives for organizing reasoning structures",
+      "items": [
+        {
+          "id": "linear-pipeline",
+          "label": "Linear Pipeline",
+          "description": "Stepwise sequential thought flow."
+        },
+        {
+          "id": "network-graph",
+          "label": "Network Graph",
+          "description": "Multi-path node/edge reasoning topology."
+        },
+        {
+          "id": "hierarchical-taxonomy",
+          "label": "Hierarchical Taxonomy",
+          "description": "Tree-style decomposition by abstraction level."
+        }
+      ],
+      "compare_axes": [
+        "compositionality",
+        "traversal_style",
+        "explainability"
+      ]
+    }
+  ],
+  "relations": [
+    { "target": "Mx2LM",       "verb": "@redirect",    "directed": true  },
+    { "target": "REASON-µ",    "verb": "@part_of",  "directed": true  },
+    { "target": "MEM-µ",       "verb": "@produces","directed": true  },
+    { "target": "ORCH-µ",      "verb": "@produces","directed": true  },
+    { "target": "THEORY-OF-MIND-µ", "verb": "@related_to", "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop", "op": "gramRead",                "key": "thought_outline_query" },
+    { "phase": "Wo",  "op": "extract_cognitive_axes" },
+    { "phase": "Wo",  "op": "build_node_taxonomy" },
+    { "phase": "Sek", "op": "emit_graph_pattern_plan" },
+    { "phase": "Xul", "op": "gramWrite",               "scope": "local" }
+  ],
+  "sandbox": {
+    "gram_ns": "THOUGHT-OUTLINE-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": ["gramRead", "gramWrite", "route:aggregate", "route:compose", "route:relate"],
+    "ports": [],
+    "coordinator": false
+  }
+}

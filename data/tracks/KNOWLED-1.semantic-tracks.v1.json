@@ -1,0 +1,62 @@
+{
+  "@no-eval": true,
+  "id": "KNOWLED-1",
+  "description": "Knowledge distillation — Sek→Ch'en semantic graph evolution and compression",
+  "phase": "Sek",
+  "confidence": 1.0,
+  "governs": ["distill", "compress", "knowledge", "semantic", "graph", "evolve", "fold",
+              "consolidate", "summarize", "learn", "understand",
+              "question answering", "closed-book", "closed-domain", "truth-conditional"],
+  "capabilities": ["knowledge-distillation", "semantic-graph-mutation", "EVOLVE-gate",
+                   "n-gram-extraction", "manifest-compression",
+                   "knowledge-graph-qa-support", "truth-conditional-compression-check"],
+  "qa_profile": {
+    "modes": ["closed_book", "closed_domain"],
+    "approaches": ["knowledge_graph", "hybrid", "rule_based"],
+    "answer_types": ["fact", "definition", "list", "how", "why"],
+    "truth_model": "evidence_scored",
+    "ontology_required": true
+  },
+  "truth_semantics": [
+    {
+      "proposition": "distilled_knowledge_k",
+      "truth_when": "k preserves source truth conditions after compression",
+      "false_when": "compression removes required conditions or changes proposition semantics",
+      "evidence_required": true
+    }
+  ],
+  "has_a_hierarchy": [
+    {
+      "owner": "knowledge_distiller",
+      "member": "source_corpus",
+      "relation": "contains",
+      "ownership": "owned",
+      "cardinality": "1:n",
+      "rule": "source corpus members are bounded by manifest and policy"
+    },
+    {
+      "owner": "knowledge_distiller",
+      "member": "distilled_graph",
+      "relation": "has_a",
+      "ownership": "owned",
+      "cardinality": "1:1",
+      "rule": "one active distilled graph checkpoint per evolve run"
+    }
+  ],
+  "folds": [
+    {"phase": "Pop",  "op": "gramRead",     "key": "distill_input"},
+    {"phase": "Sek",  "op": "extract_ngrams"},
+    {"phase": "Sek",  "op": "compute_semantic_distance"},
+    {"phase": "Ch'en","op": "verify_evolution"},
+    {"phase": "Xul",  "op": "commit_to_semantic_graph",  "scope": "local", "gate": "⟁EVOLVE⟁"}
+  ],
+  "invariant": "ΔZ = ΔG_semantic ⊕ ΔC_earned",
+  "memory_patterns": ["distill_corpus", "semantic_delta", "graph_checkpoint"],
+  "sandbox": {
+    "gram_ns":         "KNOWLED-1",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects":         ["gramRead", "gramWrite", "semantic_graph:write", "manifest:write"],
+    "ports":           [9000],
+    "coordinator":     false
+  }
+}

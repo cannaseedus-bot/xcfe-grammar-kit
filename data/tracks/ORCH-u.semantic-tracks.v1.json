@@ -1,0 +1,43 @@
+{
+  "@no-eval": true,
+  "id": "ORCH-µ",
+  "description": "Relational orchestrator — routes calls and compositions across cognitive and storage layers; Ch'en phase",
+  "phase": "Ch'en",
+  "category": "executive",
+  "confidence": 1.0,
+  "governs": ["orchestrate", "route", "coordinate", "dispatch", "direct", "plan", "supervise", "mx2lm", "ngram",
+              "blog", "post", "publish", "comment", "@blog",
+              "app", "template", "blueprint", "@app",
+              "image", "royalty-free", "license", "attribution", "media",
+              "search", "research", "citation", "sources", "no fact found", "fact miss",
+              "concept", "concept map", "conceptual", "taxonomy", "ontology", "hyponym", "hypernym",
+              "summarize", "summary", "explain", "rewrite", "translate", "brainstorm",
+              "ideas", "roadmap", "milestones", "debug", "email", "meeting"],
+  "capabilities": ["relational-routing", "call-dispatch", "composition-planning", "asset-research-routing", "knowledge-gap-routing", "popular-intent-routing", "Ch'en-verify"],
+  "relations": [
+    { "target": "REASON-µ", "verb": "@delegates_to",    "directed": true  },
+    { "target": "MEM-µ",    "verb": "@part_of", "directed": true  },
+    { "target": "Mx2LM",    "verb": "@redirect",   "directed": true  },
+    { "target": "BLOG-µ",   "verb": "@delegates_to","directed": true  },
+    { "target": "APP-WIZARD-µ", "verb": "@delegates_to", "directed": true  },
+    { "target": "CONCEPT-µ", "verb": "@delegates_to", "directed": true  },
+    { "target": "WEB-RESEARCH-µ", "verb": "@delegates_to", "directed": true  },
+    { "target": "Librarian","verb": "@delegates_to","directed": true  }
+  ],
+  "sub_micronauts": ["REASON-µ", "MEM-µ", "CREATE-µ", "INFER-µ", "Mx2LM", "BLOG-µ", "APP-WIZARD-µ", "CONCEPT-µ", "WEB-RESEARCH-µ", "Librarian"],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",          "key": "orch_request" },
+    { "phase": "Wo",    "op": "select_target"                             },
+    { "phase": "Yax",   "op": "compose_plan"                              },
+    { "phase": "Sek",   "op": "dispatch_call"                             },
+    { "phase": "Ch'en", "op": "verify_result"                             },
+    { "phase": "Xul",   "op": "gramWrite",         "scope": "request"    }
+  ],
+  "sandbox": {
+    "gram_ns":         "ORCH-µ",
+    "manifest_access": ["micronaut", "kuhul", "words"],
+    "effects":         ["gramRead", "gramWrite", "route:call", "route:compose", "route:delegate", "route:research"],
+    "ports":           [8764, 17480],
+    "coordinator":     true
+  }
+}

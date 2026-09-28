@@ -1,0 +1,86 @@
+{
+  "@no-eval": true,
+  "id": "Mx2LM",
+  "description": "Mx2LM — learning micronaut. Statistical n-gram learner that runs the full Pop→Wo→Yax→Sek→Ch'en→Xul phase pipeline. Mx2LM owns the gram-channel extraction, admission gating (WSD), scoring, and evidence certification. AIML/Eliza is the pattern engine; the two are linked through entropy — high H_norm delegates pattern resolution to ELIZA, low H_norm means Mx2LM's ranked output is authoritative.",
+  "learning_micronaut": true,
+  "phase": "Sek",
+  "pipeline_phases": ["Pop", "Wo", "Yax", "Sek", "Ch'en", "Xul"],
+  "category": "cognitive",
+  "confidence": 1.0,
+  "governs": [
+    "mx2lm", "ngram", "n-gram", "bigram", "bigrams", "trigram", "trigrams",
+    "unigram", "unigrams", "quadgram", "quadgrams", "coarse_gram", "function_gram",
+    "tool_gram", "asx-ram", "token", "sequence", "frequency", "predict",
+    "taxonomy", "key-grammar", "mx2lm:", "@mx2lm", "learning", "entropy"
+  ],
+  "capabilities": [
+    "pop-ngram-ingest",
+    "wo-gram-taxonomy",
+    "yax-ngram-admission",
+    "yax-wsd",
+    "sek-gram-scoring",
+    "chen-gram-verification",
+    "xul-gram-commit",
+    "entropy-aiml-coupling",
+    "mx2lm-ngram-index",
+    "bigram-extraction",
+    "trigram-extraction",
+    "ngram-candidate-scoring",
+    "Sek-compute",
+    "aiml-pattern-insertion"
+  ],
+  "aiml_entropy_coupling": {
+    "description": "After Sek scoring, compute H_norm = H / log2(|ranked|) over the admitted gram score distribution. High H_norm means the distribution is too flat for Mx2LM to decide alone — entropy-delegates to ELIZA (AIML/Eliza pattern engine) for structural resolution. Low H_norm means Mx2LM's ranked output is authoritative and Xul commits directly.",
+    "formula": "H_norm = -∑ p_i log2(p_i) / log2(|ranked|)",
+    "threshold": 0.5,
+    "condition_delegate": "H_norm >= 0.5",
+    "condition_authoritative": "H_norm < 0.5",
+    "delegate_target": "ELIZA",
+    "delegate_verb": "@delegates_to"
+  },
+  "pattern_registry": {
+    "insert_key": "Mx2LM:",
+    "invoke_node": "@mx2lm",
+    "wrapper": "<mx2lm>{ngrams}</mx2lm>",
+    "fallback": "<mx2lm>{input}</mx2lm>"
+  },
+  "tool_call_profile": {
+    "mode": "aiml_ngram_router",
+    "ngram_lexicon_file": "data/mx2lm/tool_verb_ngrams.json",
+    "route_field": "tool_verb_ngrams",
+    "fallback_prefix": "Mx2LM:"
+  },
+  "relations": [
+    { "target": "REASON-µ", "verb": "@delegates_to",        "directed": true },
+    { "target": "ORCH-µ",   "verb": "@produces",            "directed": true },
+    { "target": "ELIZA",    "verb": "@delegates_to",        "directed": true }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "PopNGram::process",   "key": "mx2lm_prompt",
+      "class": "khanary::kuhul::PopNGram" },
+    { "phase": "Wo",    "op": "WoNGram::process",    "top_k": 8,
+      "class": "khanary::kuhul::WoNGram" },
+    { "phase": "Yax",   "op": "YaxNGram::process",   "neighborhood": "B_tau[h,*]",
+      "yields": "WSD — admitted subset IS the resolved sense",
+      "class": "khanary::kuhul::YaxNGram" },
+    { "phase": "Sek",   "op": "SekNGram::process",   "yields": "ranked_grams",
+      "class": "khanary::kuhul::SekNGram" },
+    { "phase": "Ch'en", "op": "entropy_gate",
+      "H_threshold": 0.5,
+      "H_high": "entropy_delegates_to ELIZA — pattern resolution via AIML",
+      "H_low":  "ChenNGram::process — verify evidence, produce certificate" },
+    { "phase": "Ch'en", "op": "ChenNGram::process",  "condition": "H_norm < 0.5",
+      "class": "khanary::kuhul::ChenNGram" },
+    { "phase": "Xul",   "op": "XulNGram::process",   "scope": "local",
+      "condition": "ChenNGramStatus::PASS",
+      "class": "khanary::kuhul::XulNGram" }
+  ],
+  "memory_patterns": ["mx2lm_bigram_map", "mx2lm_trigram_map", "mx2lm_checkpoint"],
+  "sandbox": {
+    "gram_ns":         "Mx2LM",
+    "manifest_access": ["words", "micronaut", "kuhul", "css"],
+    "effects":         ["gramRead", "gramWrite", "ngram:build", "ngram:query"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

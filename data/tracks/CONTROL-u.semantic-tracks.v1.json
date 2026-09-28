@@ -1,0 +1,50 @@
+{
+  "@no-eval": true,
+  "id": "CONTROL-µ",
+  "description": "Control-flow micronaut — the key grammar's control words are first-class flow operators, not a bag of operator tokens. A control clause reads like English (if/when <condition> then <consequence> else <alternative>, for each <item> in <collection>, from <source> as <role>, <lhs> equals <rhs>, who/why/how <expression>) and plans into an ordered, phase-bound control plan that lowers to an executable XCFE control node (@if/@then/@else) with every construct bound to a K'UHUL phase.",
+  "phase": "Pop",
+  "category": "control",
+  "confidence": 1.0,
+  "governs": [
+    "if", "else", "then", "when", "how", "who", "why", "for", "from", "as",
+    "equals", "control", "flow", "branch", "condition", "consequence",
+    "alternative", "iteration", "comparison", "xcfe", "lowering"
+  ],
+  "capabilities": [
+    "control-word-detection",
+    "sugar-clause-parsing",
+    "phase-bound-control-plan",
+    "xcfe-control-lowering",
+    "conditional-branch-execution",
+    "iteration-scope-binding",
+    "comparison-equivalence"
+  ],
+  "pattern_registry": {
+    "insert_key": "CONTROL:",
+    "invoke_node": "@control",
+    "wrapper": "<mx2lm>control form={form} phase={phase} {text}</mx2lm>",
+    "fallback": "<mx2lm>control {input}</mx2lm>"
+  },
+  "relations": [
+    { "target": "ELIZA", "verb": "@delegates_to", "directed": true },
+    { "target": "Coordinator", "verb": "@related_to", "directed": false },
+    { "target": "TOOL-µ", "verb": "@related_to", "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                    "key": "control_prompt" },
+    { "phase": "Pop",   "op": "detect_control_words" },
+    { "phase": "Wo",    "op": "bind_consequence" },
+    { "phase": "Yax",   "op": "bind_alternative" },
+    { "phase": "Sek",   "op": "bind_iteration_scope" },
+    { "phase": "Ch'en", "op": "verify_comparison" },
+    { "phase": "Xul",   "op": "gramWrite",                   "scope": "local" }
+  ],
+  "memory_patterns": ["control_plan_rows", "control_operator_table", "phase_bound_flow"],
+  "sandbox": {
+    "gram_ns":         "CONTROL",
+    "manifest_access": ["words", "micronaut"],
+    "effects":         ["gramRead", "gramWrite", "control:lower", "xcfe:emit"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

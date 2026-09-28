@@ -1,0 +1,77 @@
+{
+  "@no-eval": true,
+  "id": "COMP-THEORY-OF-MIND-µ",
+  "description": "Computational theory of mind specialist — converts CTM discourse into typed reasoning-node patterns and symbolic/neural comparison paths.",
+  "phase": "Wo",
+  "category": "theory",
+  "confidence": 1.0,
+  "static_weight": 1.0,
+  "health": 1.0,
+  "source_jsonl": "data/Computational_theory_of_mind.jsonl",
+  "governs": [
+    "computational", "computation", "computability", "ctm", "mind", "cognition",
+    "mental", "representation", "symbol", "symbolic", "turing", "putnam",
+    "fodor", "machine", "computer", "brain", "neural", "functionalism",
+    "compare", "contrast", "versus", "difference", "similarity", "contrast set"
+  ],
+  "capabilities": [
+    "ctm-framing",
+    "symbolic-computation-modeling",
+    "mental-representation-analysis",
+    "neural-symbolic-contrast",
+    "reasoning-graph-node-seeding",
+    "contrast-set-analysis",
+    "comparative-reasoning"
+  ],
+  "contrast_sets": [
+    {
+      "id": "ctm-account-family",
+      "slot": "account_of_mind_computation",
+      "context": "bounded alternatives for mind-as-computation explanations",
+      "items": [
+        {
+          "id": "symbolic-ctm",
+          "label": "Symbolic CTM",
+          "description": "Mind as symbol manipulation over structured representations."
+        },
+        {
+          "id": "connectionist-ctm",
+          "label": "Connectionist CTM",
+          "description": "Mind as distributed neural-style computation over weighted activations."
+        },
+        {
+          "id": "embodied-enactive-account",
+          "label": "Embodied/Enactive Account",
+          "description": "Cognition as sensorimotor coupling rather than detached symbol rules."
+        }
+      ],
+      "compare_axes": [
+        "representation_form",
+        "rule_explicitness",
+        "neural_realizability"
+      ]
+    }
+  ],
+  "relations": [
+    { "target": "PHIL-AI-µ", "verb": "@related_to",  "directed": false },
+    { "target": "ARTIFICIAL-CONSCIOUSNESS-µ", "verb": "@related_to", "directed": false },
+    { "target": "REASON-µ", "verb": "@governs",    "directed": true  },
+    { "target": "INFER-µ",  "verb": "@supports",  "directed": true  },
+    { "target": "Mx2LM",    "verb": "@redirect",   "directed": true  }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                 "key": "ctm_query" },
+    { "phase": "Wo",    "op": "extract_computational_claims" },
+    { "phase": "Wo",    "op": "seed_reasoning_nodes" },
+    { "phase": "Sek",   "op": "build_symbolic_neural_map" },
+    { "phase": "Ch'en", "op": "verify_model_consistency" },
+    { "phase": "Xul",   "op": "gramWrite",                "scope": "local" }
+  ],
+  "sandbox": {
+    "gram_ns": "COMP-THEORY-OF-MIND-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": ["gramRead", "gramWrite", "route:eval", "route:verify", "route:relate"],
+    "ports": [],
+    "coordinator": false
+  }
+}

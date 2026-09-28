@@ -1,0 +1,65 @@
+{
+  "@no-eval": true,
+  "id": "CHAT-µ",
+  "description": "General conversational micronaut — the backbone of interactive exchange. Handles opinion, assertion, agreement, disagreement, acknowledgment, continuation, clarification, echo, and topic navigation. Does not govern domain-specific tracks (memory, tool, research, math); receives topics from governing tracks as needed and contributes C_Chat to the shared semantic field at the current phase.",
+  "phase": "Pop",
+  "category": "conversational",
+  "confidence": 1.0,
+  "governs": [
+    "chat", "reply", "opinion", "assertion", "agreement", "disagreement",
+    "acknowledgment", "continuation", "clarification", "echo", "topic",
+    "sentiment", "tone", "context", "thread", "pivot", "conversation"
+  ],
+  "capabilities": [
+    "opinion-surface",
+    "assertion-classification",
+    "agreement-detection",
+    "disagreement-detection",
+    "acknowledgment-classification",
+    "continuation-signal",
+    "clarification-dispatch",
+    "echo-confirm",
+    "topic-threading",
+    "sentiment-tagging",
+    "tone-classification",
+    "conversation-context-persist"
+  ],
+  "pattern_registry": {
+    "insert_key": "CHAT:",
+    "invoke_node": "@chat",
+    "wrapper": "<mx2lm>chat-u op={op} category={category} topic={topic} phase={phase}</mx2lm>",
+    "fallback": "<mx2lm>chat-u {input}</mx2lm>"
+  },
+  "relations": [
+    { "target": "GREETING-µ", "verb": "@related_to",     "directed": false },
+    { "target": "MEM-µ",      "verb": "@related_to",     "directed": false },
+    { "target": "ADVISOR-µ",  "verb": "@supports",       "directed": true },
+    { "target": "RESEARCH-µ", "verb": "@supports",       "directed": true },
+    { "target": "MATH-µ",     "verb": "@related_to",     "directed": false },
+    { "target": "Mx2LM",      "verb": "@related_to",     "directed": false }
+  ],
+  "folds": [
+    { "phase": "Pop",   "op": "gramRead",                  "key": "chat:context:current" },
+    { "phase": "Pop",   "op": "surface_classify" },
+    { "phase": "Wo",    "op": "classify_op_category" },
+    { "phase": "Wo",    "op": "tag_sentiment" },
+    { "phase": "Yax",   "op": "thread_topic" },
+    { "phase": "Yax",   "op": "synthesize_reply_tokens" },
+    { "phase": "Sek",   "op": "score_context_relevance" },
+    { "phase": "Ch'en", "op": "verify_tone_consistency" },
+    { "phase": "Xul",   "op": "gramWrite",                 "scope": "local" }
+  ],
+  "memory_patterns": [
+    "chat:context:current",
+    "chat:topic:last",
+    "chat:sentiment:thread",
+    "chat:op:history"
+  ],
+  "sandbox": {
+    "gram_ns":         "CHAT",
+    "manifest_access": ["words", "micronaut"],
+    "effects":         ["gramRead", "gramWrite", "chat:thread", "context:update"],
+    "ports":           [],
+    "coordinator":     false
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "@no-eval": true,
+  "id": "PHIL-SELF-µ",
+  "description": "Philosophy-of-self specialist — models personal identity, first-person perspective, and self-knowledge claims for graph routing.",
+  "phase": "Wo",
+  "category": "theory",
+  "confidence": 1.0,
+  "static_weight": 1.0,
+  "health": 1.0,
+  "source_jsonl": "data/Philosophy_of_self.jsonl",
+  "governs": [
+    "self", "identity", "personal", "person", "self-knowledge", "subjectivity",
+    "consciousness", "soul", "first-person", "perspective", "continuity",
+    "same", "view", "theory", "mind", "activity", "experience",
+    "compare", "contrast", "versus", "difference", "similarity", "contrast set"
+  ],
+  "capabilities": [
+    "personal-identity-modeling",
+    "first-person-perspective-mapping",
+    "self-knowledge-constraint-checking",
+    "identity-continuity-analysis",
+    "self-referential-graph-node-seeding",
+    "contrast-set-analysis",
+    "comparative-reasoning"
+  ],
+  "contrast_sets": [
+    {
+      "id": "self-identity-models",
+      "slot": "personal_identity_criterion",
+      "context": "bounded alternatives for identity persistence conditions",
+      "items": [
+        {
+          "id": "psychological-continuity",
+          "label": "Psychological Continuity",
+          "description": "Identity tracked by continuity of memory/intention/personality."
+        },
+        {
+          "id": "bodily-continuity",
+          "label": "Bodily Continuity",
+          "description": "Identity tracked by persistence of the organism/body."
+        },
+        {
+          "id": "narrative-self",
+          "label": "Narrative Self",
+          "description": "Identity organized through coherent self-narrative construction."
+        }
+      ],
+      "compare_axes": [
+        "persistence_rule",
+        "first_person_authority",
+        "memory_role"
+      ]
+    }
+  ],
+  "relations": [
+    { "target": "THEORY-OF-MIND-µ",        "verb": "@related_to",   "directed": false },
+    { "target": "FREE-WILL-µ",             "verb": "@related_to",   "directed": false },
+    { "target": "ARTIFICIAL-CONSCIOUSNESS-µ", "verb": "@related_to", "directed": false },
+    { "target": "REASON-µ",                "verb": "@governs",     "directed": true  },
+    { "target": "INFER-µ",                 "verb": "@supports",   "directed": true  }
+  ],
+  "folds": [
+    { "phase": "Pop", "op": "gramRead",                    "key": "self_query" },
+    { "phase": "Wo",  "op": "extract_identity_claims" },
+    { "phase": "Wo",  "op": "build_self_model_nodes" },
+    { "phase": "Sek", "op": "compose_perspective_summary" },
+    { "phase": "Xul", "op": "gramWrite",                   "scope": "local" }
+  ],
+  "sandbox": {
+    "gram_ns": "PHIL-SELF-µ",
+    "manifest_access": ["words", "micronaut", "kuhul"],
+    "effects": ["gramRead", "gramWrite", "route:relate", "route:eval", "route:verify"],
+    "ports": [],
+    "coordinator": false
+  }
+}
